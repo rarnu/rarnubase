@@ -14,9 +14,9 @@ object ZipUtils {
 
     init {
         try {
-            System.loadLibrary("hjz")
+            System.loadLibrary("compress")
         } catch(e: Exception) {
-            Log.e("ZipUtils", "System.loadLibrary(\"hjz\") => ${e.message}")
+            Log.e("ZipUtils", "System.loadLibrary(\"compress\") => ${e.message}")
         }
     }
 

@@ -1,20 +1,20 @@
-buildscript {
-    ext.kotlin_version = '1.1.2-2'
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-repositories {
-    mavenCentral()
-}
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+def gitUrl = 'https://github.com/rarnu/rarnubase'
+def group = "com.rarnu.base"
+def libName = "rarnubase"
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
+}
 
 android {
     compileSdkVersion 25
@@ -28,6 +28,53 @@ android {
     }
 }
 
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                name libName
+                url gitUrl
+                licenses {
+                    license {
+                        name libName
+                        url gitUrl
+                    }
+                }
+                developers {
+                    developer {
+                        id 'rarnu1985'
+                        name 'rarnu'
+                        email 'ranru1985@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url gitUrl
+                }
+            }
+        }
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name = libName
+        desc = ''
+        websiteUrl = gitUrl
+        vcsUrl = gitUrl
+        licenses = ["GPLv3"]
+        publish = true
+    }
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile "com.squareup.okhttp3:okhttp:3.8.0"
@@ -36,4 +83,5 @@ dependencies {
 }
 
 project.gradle.startParameter.excludedTaskNames.add('lint')
-// project.gradle.startParameter.excludedTaskNames.add('lintVitalRelease')
+project.gradle.startParameter.excludedTaskNames.add('compileDebugNdk')
+project.gradle.startParameter.excludedTaskNames.add('compilereleaseNdk')
