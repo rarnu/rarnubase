@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Smmooth Progressbar -->
+    <color name="spbDefaultColor">#33b5e5</color>
+    <dimen name="spbDefaultStrokeSeparatorLength">4dp</dimen>
+    <dimen name="spbDefaultStrokeWidth">4dp</dimen>
+    <integer name="spbDefaultSectionsCount">4</integer>
+    <integer name="spbDefaultInterpolator">0</integer>
+    <item name="spbDefaultSpeed" format="float" type="string">1</item>
+    <bool name="spbDefaultReversed">false</bool>
+    <bool name="spbDefaultMirrorMode">false</bool>
+    <bool name="spbDefaultProgressiveStartActivated">false</bool>
+
+    <!-- Circular Progressbar -->
+    <color name="cpbDefaultColor">#33b5e5</color>
+    <dimen name="cpbDefaultStrokeWidth">4dp</dimen>
+    <integer name="cpbDefaultMinSweepAngle">20</integer>
+    <integer name="cpbDefaultMaxSweepAngle">300</integer>
+    <item name="cpbDefaultSweepSpeed" format="float" type="string">1</item>
+    <item name="cpbDefaultRotationSpeed" format="float" type="string">1</item>
+</resources>

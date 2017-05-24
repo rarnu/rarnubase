@@ -1,0 +1,37 @@
+buildscript {
+    ext.kotlin_version = '1.1.2-2'
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile project(':rarnubase')
+}
+
+project.gradle.startParameter.excludedTaskNames.add('lint')

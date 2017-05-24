@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Sliding Menu -->
+    <declare-styleable name="SlidingMenu">
+        <attr name="mode">
+            <enum name="left" value="0"/>
+            <enum name="right" value="1"/>
+        </attr>
+        <attr name="viewAbove" format="reference"/>
+        <attr name="viewBehind" format="reference"/>
+        <attr name="behindOffset" format="dimension"/>
+        <attr name="behindWidth" format="dimension"/>
+        <attr name="behindScrollScale" format="float"/>
+        <attr name="touchModeAbove">
+            <enum name="margin" value="0"/>
+            <enum name="fullscreen" value="1"/>
+        </attr>
+        <attr name="touchModeBehind">
+            <enum name="margin" value="0"/>
+            <enum name="fullscreen" value="1"/>
+        </attr>
+        <attr name="shadowDrawable" format="reference"/>
+        <attr name="shadowWidth" format="dimension"/>
+        <attr name="fadeEnabled" format="boolean"/>
+        <attr name="fadeDegree" format="float"/>
+        <attr name="selectorEnabled" format="boolean"/>
+        <attr name="selectorDrawable" format="reference"/>
+    </declare-styleable>
+
+    <!-- PullToRefresh -->
+    <declare-styleable name="PullToRefresh">
+        <attr name="ptrRefreshableViewBackground" format="reference|color" />
+        <attr name="ptrHeaderBackground" format="reference|color" />
+        <attr name="ptrHeaderTextColor" format="reference|color" />
+        <attr name="ptrHeaderSubTextColor" format="reference|color" />
+        <attr name="ptrMode">
+            <flag name="disabled" value="0x0" />
+            <flag name="pullFromStart" value="0x1" />
+            <flag name="pullFromEnd" value="0x2" />
+            <flag name="both" value="0x3" />
+            <flag name="manualOnly" value="0x4" />
+            <flag name="pullDownFromTop" value="0x1" />
+            <flag name="pullUpFromBottom" value="0x2" />
+        </attr>
+
+        <attr name="ptrShowIndicator" format="reference|boolean" />
+        <attr name="ptrDrawable" format="reference" />
+        <attr name="ptrDrawableStart" format="reference" />
+        <attr name="ptrDrawableEnd" format="reference" />
+        <attr name="ptrOverScroll" format="reference|boolean" />
+        <attr name="ptrHeaderTextAppearance" format="reference" />
+        <attr name="ptrSubHeaderTextAppearance" format="reference" />
+        <attr name="ptrAnimationStyle">
+            <flag name="rotate" value="0x0" />
+            <flag name="flip" value="0x1" />
+        </attr>
+        <attr name="ptrScrollingWhileRefreshingEnabled" format="reference|boolean" />
+        <attr name="ptrListViewExtrasEnabled" format="reference|boolean" />
+        <attr name="ptrRotateDrawableWhilePulling" format="reference|boolean" />
+        <attr name="ptrAdapterViewBackground" format="reference|color" />
+        <attr name="ptrDrawableTop" format="reference" />
+        <attr name="ptrDrawableBottom" format="reference" />
+    </declare-styleable>
+
+    <!-- Swipe Layout -->
+    <declare-styleable name="SwipeLayout">
+        <attr name="drag_edge" format="enum">
+            <enum name="left" value="0" />
+            <enum name="right" value="1" />
+            <enum name="top" value="2" />
+            <enum name="bottom" value="3" />
+        </attr>
+        <attr name="horizontalSwipeOffset" format="dimension" />
+        <attr name="verticalSwipeOffset" format="dimension" />
+        <attr name="show_mode" format="enum">
+            <enum name="lay_down" value="0" />
+            <enum name="pull_out" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <!-- DragListView -->
+    <declare-styleable name="DragListView">
+        <attr name="collapsed_height" format="dimension" />
+        <attr name="drag_scroll_start" format="float" />
+        <attr name="max_drag_scroll_speed" format="float" />
+        <attr name="float_background_color" format="color" />
+        <attr name="remove_mode">
+            <enum name="clickRemove" value="0" />
+            <enum name="flingRemove" value="1" />
+        </attr>
+        <attr name="float_alpha" format="float" />
+        <attr name="slide_shuffle_speed" format="float" />
+        <attr name="remove_animation_duration" format="integer" />
+        <attr name="drop_animation_duration" format="integer" />
+        <attr name="drag_enabled" format="boolean" />
+        <attr name="sort_enabled" format="boolean" />
+        <attr name="remove_enabled" format="boolean" />
+        <attr name="drag_start_mode">
+            <enum name="onDown" value="0" />
+            <enum name="onMove" value="1" />
+            <enum name="onLongPress" value="2" />
+        </attr>
+        <attr name="drag_handle_id" format="integer" />
+        <attr name="fling_handle_id" format="integer" />
+        <attr name="click_remove_id" format="integer" />
+        <attr name="use_default_controller" format="boolean" />
+    </declare-styleable>
+
+    <!-- FlipView -->
+    <declare-styleable name="FlipView">
+        <attr name="orientation" format="enum">
+            <enum name="vertical" value="0"/>
+            <enum name="horizontal" value="1"/>
+        </attr>
+        <attr name="overFlipMode" format="enum">
+            <enum name="glow" value="0"/>
+            <enum name="rubber_band" value="1"/>
+        </attr>
+    </declare-styleable>
+
+    <!-- ArcMenu -->
+    <attr name="fromDegrees" format="float|reference" />
+    <attr name="toDegrees" format="float|reference" />
+    <attr name="childSize" format="dimension|reference" />
+    <declare-styleable name="ArcLayout">
+        <attr name="fromDegrees"/>
+        <attr name="toDegrees"/>
+        <attr name="childSize"/>
+    </declare-styleable>
+    <declare-styleable name="ArcMenu">
+        <attr name="fromDegrees"/>
+        <attr name="toDegrees"/>
+        <attr name="childSize"/>
+    </declare-styleable>
+    <declare-styleable name="RayLayout">
+        <attr name="leftHolderWidth" format="dimension" />
+        <attr name="childSize"/>
+    </declare-styleable>
+    <declare-styleable name="RayMenu">
+        <attr name="childSize"/>
+    </declare-styleable>
+
+    <!-- wheel progressbar -->
+    <declare-styleable name="WheelProgressBar">
+        <attr name="pwText" format="string" />
+        <attr name="pwTextColor" format="color" />
+        <attr name="pwTextSize" format="dimension" />
+        <attr name="pwBarColor" format="color" />
+        <attr name="pwRimColor" format="color" />
+        <attr name="pwRimWidth" format="dimension" />
+        <attr name="pwSpinSpeed" format="dimension" />
+        <attr name="pwDelayMillis" format="integer" />
+        <attr name="pwCircleColor" format="color" />
+        <attr name="pwRadius" format="dimension" />
+        <attr name="pwBarWidth" format="dimension" />
+        <attr name="pwBarLength" format="dimension" />
+        <attr name="pwContourColor" format="color"/>
+        <attr name="pwContourSize" format="dimension"/>
+    </declare-styleable>
+
+    <!-- Smooth Progressbar -->
+    <declare-styleable name="SmoothProgressBar">
+        <attr name="spbStyle" format="reference"/>
+        <attr name="spbColor" format="color"/>
+        <attr name="spbStrokeWidth" format="dimension"/>
+        <attr name="spbStrokeSeparatorLength" format="dimension"/>
+        <attr name="spbSectionsCount" format="integer"/>
+        <attr name="spbSpeed" format="float"/>
+        <attr name="spbProgressiveStartSpeed" format="float"/>
+        <attr name="spbProgressiveStopSpeed" format="float"/>
+        <attr name="spbInterpolator" format="enum">
+            <enum name="spbInterpolatorAccelerate" value="0"/>
+            <enum name="spbInterpolatorLinear" value="1"/>
+            <enum name="spbInterpolatorAccelerateDecelerate" value="2"/>
+            <enum name="spbInterpolatorDecelerate" value="3"/>
+        </attr>
+        <attr name="spbReversed" format="boolean"/>
+        <attr name="spbMirrorMode" format="boolean"/>
+        <attr name="spbColors" format="reference"/>
+        <attr name="spbProgressiveStartActivated" format="boolean"/>
+        <attr name="spbBackground" format="reference"/>
+        <attr name="spbGenerateBackgroundWithColors" format="boolean"/>
+        <attr name="spbGradients" format="boolean"/>
+    </declare-styleable>
+
+    <!-- Circular Progressbar -->
+    <declare-styleable name="CircularProgressBar">
+        <attr name="cpbStyle" format="reference"/>
+        <attr name="cpbColor" format="color"/>
+        <attr name="cpbColors" format="reference"/>
+        <attr name="cpbStrokeWidth" format="dimension"/>
+        <attr name="cpbMinSweepAngle" format="integer"/>
+        <attr name="cpbMaxSweepAngle" format="integer"/>
+        <attr name="cpbSweepSpeed" format="float"/>
+        <attr name="cpbRotationSpeed" format="float"/>
+    </declare-styleable>
+
+
+    <!-- CropImageView -->
+    <declare-styleable name="CropImageView">
+        <attr name="guidelines">
+            <enum name="off" value="0"/>
+            <enum name="onTouch" value="1"/>
+            <enum name="on" value="2"/>
+        </attr>
+        <attr name="fixAspectRatio" format="boolean"/>
+        <attr name="aspectRatioX" format="integer"/>
+        <attr name="aspectRatioY" format="integer"/>
+
+    </declare-styleable>
+
+    <!-- ImageCoverFlow -->
+    <declare-styleable name="ImageCoverFlowView">
+        <attr name="visibleImage" format="integer" />
+        <attr name="reflectionHeight" format="fraction" />
+        <attr name="reflectionGap" format="dimension" />
+        <attr name="topImageClickEnable" format="boolean" />
+        <attr name="coverflowGravity" format="enum">
+            <enum name="top" value="0" />
+            <enum name="bottom" value="1" />
+            <enum name="center_vertical" value="2" />
+        </attr>
+        <attr name="coverflowLayoutMode" format="enum">
+            <enum name="match_parent" value="0"/>
+            <enum name="wrap_content" value="1"/>
+        </attr>
+    </declare-styleable>
+</resources>
