@@ -26,7 +26,7 @@ class PullToRefreshViewPager: PullToRefreshBase<ViewPager> {
         val refreshableView = getRefreshableView()
         val adapter = refreshableView?.adapter
         if (adapter != null) {
-            return refreshableView?.currentItem == adapter.count - 1
+            return refreshableView.currentItem == adapter.count - 1
         }
         return false
     }
@@ -35,7 +35,7 @@ class PullToRefreshViewPager: PullToRefreshBase<ViewPager> {
         val refreshableView = getRefreshableView()
         val adapter = refreshableView?.adapter
         if (adapter != null) {
-            return refreshableView?.currentItem == 0
+            return refreshableView.currentItem == 0
         }
         return false
     }

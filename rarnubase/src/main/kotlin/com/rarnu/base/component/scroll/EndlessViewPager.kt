@@ -12,7 +12,7 @@ import com.rarnu.base.app.EndlessPagerAdapter
 class EndlessViewPager: ViewPager {
 
     private var _adapter: EndlessPagerAdapter? = null
-    private var _views: MutableList<View?>? = null
+    private var _views: MutableList<View>? = null
     private var _curPosition = 0
     private var _maxPage = Integer.MAX_VALUE
     private var _pageSelected: OnPageSelected? = null
@@ -30,7 +30,7 @@ class EndlessViewPager: ViewPager {
     }
 
     private fun init() {
-        _views = arrayListOf<View?>()
+        _views = arrayListOf()
         _adapter = EndlessPagerAdapter(_views)
         adapter = _adapter
         addOnPageChangeListener(object : OnPageChangeListener {
@@ -54,7 +54,7 @@ class EndlessViewPager: ViewPager {
         currentItem = if (++_curPosition >= _maxPage) 0 else _curPosition
     }
 
-    fun setData(views: MutableList<View?>?) {
+    fun setData(views: MutableList<View>?) {
         _views = views
         _adapter?.setNewData(_views)
     }

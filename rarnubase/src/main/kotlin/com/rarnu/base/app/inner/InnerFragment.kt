@@ -9,7 +9,12 @@ import android.view.*
  */
 abstract class InnerFragment: Fragment, ViewTreeObserver.OnGlobalLayoutListener, IIntf {
 
-    protected var innerView: View? = null
+    private var _innerView: View? = null
+    protected var innerView: View
+        get() = _innerView!!
+        set(value) {
+            _innerView = value
+        }
     protected var innerBundle: Bundle? = null
     var tabTitle: String? = null
     var tabIcon = -1
@@ -19,15 +24,15 @@ abstract class InnerFragment: Fragment, ViewTreeObserver.OnGlobalLayoutListener,
         this.tabTitle = tabTitle
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         if (getFragmentLayoutResId() != 0) {
-            innerView = inflater?.inflate(getFragmentLayoutResId(), container, false)
+            innerView = inflater.inflate(getFragmentLayoutResId(), container, false)
         } else {
             innerView = getFramgmentLayoutView()
         }
         initComponents()
         initEvents()
-        innerView?.viewTreeObserver?.addOnGlobalLayoutListener(this)
+        innerView.viewTreeObserver.addOnGlobalLayoutListener(this)
         return innerView
     }
 
@@ -62,7 +67,7 @@ abstract class InnerFragment: Fragment, ViewTreeObserver.OnGlobalLayoutListener,
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater?) {
         if (activity == null) {
             return
         }
@@ -85,5 +90,5 @@ abstract class InnerFragment: Fragment, ViewTreeObserver.OnGlobalLayoutListener,
     /**
      * override the method if you do not need a layout from resource and @getFragmentLayoutResId returns 0
      */
-    protected open fun getFramgmentLayoutView(): View? = null
+    protected open fun getFramgmentLayoutView(): View = View(activity)
 }

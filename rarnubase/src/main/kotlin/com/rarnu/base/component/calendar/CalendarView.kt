@@ -107,8 +107,8 @@ class CalendarView: LinearLayout {
         _gridView?.selector = ColorDrawable(Color.TRANSPARENT)
         _gridView?.verticalSpacing = 1
         _gridView?.horizontalSpacing = 1
-        _gridView?.setOnTouchListener { v, event -> _gestureDetector!!.onTouchEvent(event) }
-        _gridView?.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+        _gridView?.setOnTouchListener { _, event -> _gestureDetector!!.onTouchEvent(event) }
+        _gridView?.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             _currentPosition = position
             val dayNumber = _calV!!.getItem(position).toString()
             val dv = dayNumber.split(".")[1]

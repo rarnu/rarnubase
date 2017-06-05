@@ -21,6 +21,7 @@ import com.rarnu.base.R
 /**
  * Created by rarnu on 3/30/16.
  */
+@Suppress("DEPRECATION")
 abstract class LoadingLayout: FrameLayout, ILoadingLayout {
 
     companion object {

@@ -1,6 +1,5 @@
 package com.rarnu.base.command
 
-import com.rarnu.base.command.Command
 import java.io.Serializable
 
 /**

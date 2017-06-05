@@ -271,13 +271,13 @@ class HTTPSession: IHTTPSession {
                 _protocolVersion = "HTTP/1.1"
                 Log.e("LOG", "no protocol version specified, strange. Assuming HTTP/1.1.")
             }
-            var line = inr?.readLine()
+            var line = inr.readLine()
             while (line != null && !line.trim().isEmpty()) {
                 val p = line.indexOf(':')
                 if (p >= 0) {
                     headers?.put(line.substring(0, p).trim().toLowerCase(Locale.US), line.substring(p + 1).trim())
                 }
-                line = inr?.readLine()
+                line = inr.readLine()
             }
 
             pre?.put("uri", uri)

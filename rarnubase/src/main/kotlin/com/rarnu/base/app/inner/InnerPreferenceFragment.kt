@@ -49,7 +49,7 @@ abstract class InnerPreferenceFragment: PreferenceFragment, IIntf {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater?) {
         if (activity == null) {
             return
         }

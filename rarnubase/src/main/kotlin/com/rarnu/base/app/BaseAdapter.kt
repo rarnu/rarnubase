@@ -6,4 +6,4 @@ import com.rarnu.base.app.inner.InnerAdapter
 /**
  * Created by rarnu on 3/23/16.
  */
-abstract class BaseAdapter<T>(context: Context, list: MutableList<T>?) : InnerAdapter<T>(context, list)
+abstract class BaseAdapter<T, H>(context: Context, list: MutableList<T>?) : InnerAdapter<T, H>(context, list)

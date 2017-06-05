@@ -20,6 +20,7 @@ import kotlin.concurrent.thread
 /**
  * Created by rarnu on 4/8/16.
  */
+@Suppress("DEPRECATION")
 object ApkUtils {
 
     val INSTALL_AUTO = 0
@@ -113,7 +114,7 @@ object ApkUtils {
     fun getIconFromPackage(context: Context, info: ApplicationInfo): Drawable? = getIconFromPackageFile(context, info)
 
     fun getIconFromPackage(context: Context, archiveFilePath: String): Drawable? {
-        val ppu = PackageParserUtils(archiveFilePath)
+        val ppu = PackageParserUtils()
         val /* PackageParser.Package */ pkg = ppu.parsePackage(archiveFilePath, 0) ?: return null
         val info = PackageParserUtils.packageApplicationInfo(pkg)
         val pRes = context.resources
@@ -188,7 +189,7 @@ object ApkUtils {
     }
 
     fun getPackageInfoFromPackage(filePath: String, collectSignature: Boolean): Any? /* PackageParser.Package */ {
-        val ppu = PackageParserUtils(filePath)
+        val ppu = PackageParserUtils()
         val /* PackageParser.Package */ pkg = ppu.parsePackage(filePath, 0)
         if (pkg != null && collectSignature) {
             ppu.packageCollectCertificates(pkg, 0)

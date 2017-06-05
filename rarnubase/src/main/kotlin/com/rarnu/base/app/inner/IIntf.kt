@@ -15,7 +15,7 @@ interface IIntf {
     fun initLogic()
     fun getFragmentLayoutResId(): Int
     fun getMainActivityName(): String?
-    fun initMenu(menu: Menu?)
+    fun initMenu(menu: Menu)
     fun onGetNewArguments(bn: Bundle?)
     fun getFragmentState(): Bundle?
 }

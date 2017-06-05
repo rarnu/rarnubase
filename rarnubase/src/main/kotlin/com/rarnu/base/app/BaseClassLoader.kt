@@ -6,7 +6,7 @@ import android.content.Context
 /**
  * Created by rarnu on 3/23/16.
  */
-abstract class BaseClassLoader<T>(context: Context?) : AsyncTaskLoader<T>(context) {
+abstract class BaseClassLoader<T>(context: Context) : AsyncTaskLoader<T>(context) {
 
     abstract override fun loadInBackground(): T?
 

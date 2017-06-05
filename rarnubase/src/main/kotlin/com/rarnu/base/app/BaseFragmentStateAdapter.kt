@@ -8,13 +8,13 @@ import android.app.FragmentManager
  */
 class BaseFragmentStateAdapter: FragmentStatePagerAdapter {
 
-    private var _list: MutableList<Fragment?>? = null
+    private var _list: MutableList<Fragment>? = null
 
-    constructor(fm: FragmentManager?, listFragment: MutableList<Fragment?>?): super(fm) {
+    constructor(fm: FragmentManager?, listFragment: MutableList<Fragment>?): super(fm) {
         _list = listFragment
     }
 
-    override fun getItem(position: Int): Fragment? = _list!![position]
+    override fun getItem(position: Int): Fragment = _list!![position]
 
     override fun getCount(): Int = _list!!.size
 }

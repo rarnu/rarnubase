@@ -34,7 +34,7 @@ abstract class BaseService: Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun doSendMessage() {
-        thread() {
+        thread {
             while (true) {
                 if (!operating) {
                     break

@@ -20,6 +20,7 @@ import com.rarnu.base.utils.UIUtils
 /**
  * Created by rarnu on 3/23/16.
  */
+@Suppress("DEPRECATION")
 abstract class BaseMainActivity: Activity(), IFragments {
 
     companion object {
@@ -59,7 +60,7 @@ abstract class BaseMainActivity: Activity(), IFragments {
 
     abstract fun getIndexFragment(): Fragment?
 
-    abstract fun initMenu(menu: Menu?)
+    abstract fun initMenu(menu: Menu)
 
     abstract fun onHomeClick()
 
@@ -113,21 +114,19 @@ abstract class BaseMainActivity: Activity(), IFragments {
         fragmentManager.beginTransaction().replace(R.id.fragmentMain, fIndex).commit()
     }
 
-    private fun replaceDetailFragment(f: Fragment?) {
-        fragmentManager.beginTransaction().replace(R.id.fragmentDetail, f).commit()
-    }
+    private fun replaceDetailFragment(f: Fragment?) = fragmentManager.beginTransaction().replace(R.id.fragmentDetail, f).commit()
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         initMenu(menu)
         return true
     }
 
     inner class HomeReceiver: BroadcastReceiver() {
 
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val action = intent?.action
+        override fun onReceive(context: Context?, data: Intent?) {
+            val action = data?.action
             if (action != null && action == Intent.ACTION_CLOSE_SYSTEM_DIALOGS) {
-                val reason = intent?.getStringExtra(SYSTEM_REASON)
+                val reason = data.getStringExtra(SYSTEM_REASON)
                 if (reason != null) {
                     if (reason == SYSTEM_HOME_KEY) {
                         onHomeClick()

@@ -10,7 +10,7 @@ import com.rarnu.base.utils.NotificationUtils
  * Created by rarnu on 3/25/16.
  */
 abstract class BaseNotifyReceiver: BroadcastReceiver() {
-    override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent?) {
         if (intent == null) {
             return
         }
@@ -21,10 +21,8 @@ abstract class BaseNotifyReceiver: BroadcastReceiver() {
         if (action == Actions.ACTION_NOTIFY) {
             val id = intent.getIntExtra("id", 0)
             onReceiveNotify(context, id)
-            NotificationUtils.cancalAllNotification(context!!, intArrayOf(id))
-
+            NotificationUtils.cancalAllNotification(context, intArrayOf(id))
         }
     }
-
-    abstract fun onReceiveNotify(context: Context?, id: Int)
+    abstract fun onReceiveNotify(context: Context, id: Int)
 }

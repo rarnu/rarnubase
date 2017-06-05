@@ -7,7 +7,7 @@ import android.database.Cursor
 /**
  * Created by rarnu on 3/23/16.
  */
-abstract class BaseCursorLoader(context: Context?) : AsyncTaskLoader<Cursor>(context) {
+abstract class BaseCursorLoader(context: Context) : AsyncTaskLoader<Cursor>(context) {
 
     abstract override fun loadInBackground(): Cursor?
 

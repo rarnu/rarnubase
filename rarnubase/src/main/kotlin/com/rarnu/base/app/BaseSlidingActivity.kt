@@ -75,15 +75,9 @@ abstract class BaseSlidingActivity: InnerActivity(), ISliding, IFragments {
         super.onDestroy()
     }
 
-    fun replaceMenu() {
-        val bf = replaceMenuFragment()
-        fragmentManager.beginTransaction().replace(R.id.menu, bf).commit()
-    }
+    fun replaceMenu() = fragmentManager.beginTransaction().replace(R.id.menu, replaceMenuFragment()).commit()
 
-    fun replaceSecondMenu() {
-        val bf = replaceSecondMenuFragment()
-        fragmentManager.beginTransaction().replace(R.id.second_menu, bf).commit()
-    }
+    fun replaceSecondMenu() = fragmentManager.beginTransaction().replace(R.id.second_menu, replaceSecondMenuFragment()).commit()
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
@@ -138,8 +132,8 @@ abstract class BaseSlidingActivity: InnerActivity(), ISliding, IFragments {
         return super.onKeyUp(keyCode, event)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item!!.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             android.R.id.home -> {
                 toggle()
                 return true

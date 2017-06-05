@@ -8,8 +8,8 @@ import com.rarnu.base.command.Command
 interface OnCommandExecutionListener {
 
     fun onCommandStart(cmd: Command)
-    fun onCommandReadLine(cmd: Command, line: String)
-    fun onCommandReadError(cmd: Command, line: String)
+    fun onCommandReadLine(cmd: Command, line: String?)
+    fun onCommandReadError(cmd: Command, line: String?)
     fun onCommandComplete(cmd: Command)
 
 }

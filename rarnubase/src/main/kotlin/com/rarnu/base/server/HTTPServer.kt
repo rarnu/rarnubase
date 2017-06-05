@@ -63,7 +63,7 @@ abstract class HTTPServer {
             return decoded
         }
 
-        fun useGzipWhenAccepted(r: Response?): Boolean = r?.getMimeType() != null && r?.getMimeType()?.toLowerCase()!!.contains("text/")
+        fun useGzipWhenAccepted(r: Response?): Boolean = r?.getMimeType() != null && r.getMimeType()?.toLowerCase()!!.contains("text/")
 
         fun newChunkedResponse(status: Response.IStatus?, mimeType: String?, data: InputStream?): Response? = Response(status, mimeType, data, -1)
 
@@ -229,7 +229,7 @@ abstract class HTTPServer {
         val method = session?.getMethod()
         if (Method.PUT == method || Method.POST == method) {
             try {
-                session?.parseBody(files)
+                session.parseBody(files)
             } catch (ioe: IOException) {
                 return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: ${ioe.message}")
             } catch (re: ResponseException) {
@@ -237,7 +237,7 @@ abstract class HTTPServer {
             }
         }
         val parms = session?.getParms()
-        parms?.put(QUERY_STRING_PARAMETER, session?.getQueryParameterString())
+        parms?.put(QUERY_STRING_PARAMETER, session.getQueryParameterString())
         return serve(session?.getUri(), method, session?.getHeaders(), parms, files)
     }
 

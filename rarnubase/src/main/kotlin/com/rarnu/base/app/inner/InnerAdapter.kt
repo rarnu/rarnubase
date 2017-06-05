@@ -3,6 +3,8 @@ package com.rarnu.base.app.inner
 import android.content.Context
 import android.content.pm.PackageManager
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.Filter
 import android.widget.Filterable
@@ -10,7 +12,8 @@ import android.widget.Filterable
 /**
  * Created by rarnu on 3/23/16.
  */
-abstract class InnerAdapter<T> : BaseAdapter, Filterable {
+@Suppress("UNCHECKED_CAST")
+abstract class InnerAdapter<T, H> : BaseAdapter, Filterable {
 
     protected val lock = Any()
     protected var context: Context
@@ -61,9 +64,30 @@ abstract class InnerAdapter<T> : BaseAdapter, Filterable {
 
     override fun getCount(): Int = list!!.size
 
-    override fun getFilter(): Filter? = throw UnsupportedOperationException()
+    override fun getFilter(): Filter? = filter
 
     abstract fun getValueText(item: T): String?
+
+    abstract fun getAdapterLayout(): Int
+
+    abstract fun newHolder(baseView: View): H
+
+    abstract fun fillHolder(baseVew: View, holder: H, item: T)
+
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        var v = convertView
+        if (v == null) {
+            v = inflater.inflate(getAdapterLayout(), parent, false)
+        }
+        var holder = v?.tag as H?
+        if (holder == null) {
+            holder = newHolder(v!!)
+            v.tag = holder
+        }
+        val item = list!![position]
+        fillHolder(v!!, holder!!, item)
+        return v
+    }
 
     open fun filter(text: String?) {
         fileter?.filter(text)

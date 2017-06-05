@@ -13,20 +13,21 @@ import java.lang.reflect.Field
 /**
  * Created by rarnu on 3/24/16.
  */
-abstract class BaseTabFragment: InnerFragment, ActionBar.TabListener, ViewPager.OnPageChangeListener {
+@Suppress("DEPRECATION")
+abstract class BaseTabFragment : InnerFragment, ActionBar.TabListener, ViewPager.OnPageChangeListener {
 
     protected var bar: ActionBar? = null
     private var pager: ViewPager? = null
     private var adapter: BaseFragmentStateAdapter? = null
-    private var listFragment: MutableList<Fragment?>? = null
+    private var listFragment: MutableList<Fragment>? = null
     var currentPage = 0
     private var needRelease = true
 
-    constructor(): super()
+    constructor() : super()
 
-    constructor(tabTitle: String): super(tabTitle)
+    constructor(tabTitle: String) : super(tabTitle)
 
-    constructor(needRelease: Boolean): super() {
+    constructor(needRelease: Boolean) : super() {
         this.needRelease = needRelease
     }
 
@@ -44,9 +45,9 @@ abstract class BaseTabFragment: InnerFragment, ActionBar.TabListener, ViewPager.
     override fun initComponents() {
         bar = activity.actionBar
         bar?.navigationMode = ActionBar.NAVIGATION_MODE_TABS
-        pager = innerView?.findViewById(R.id.pager) as ViewPager
+        pager = innerView.findViewById(R.id.pager) as ViewPager
         pager?.offscreenPageLimit = 3
-        listFragment = arrayListOf<Fragment?>()
+        listFragment = arrayListOf()
         initFragmentList(listFragment)
 
         var fm: FragmentManager?
@@ -88,7 +89,11 @@ abstract class BaseTabFragment: InnerFragment, ActionBar.TabListener, ViewPager.
                 adapter = BaseFragmentStateAdapter(fm, listFragment)
                 pager?.post {
                     pager?.adapter = adapter
-                    val newPosition = if (position == -1) { listFragment!!.size - 1 } else { position }
+                    val newPosition = if (position == -1) {
+                        listFragment!!.size - 1
+                    } else {
+                        position
+                    }
                     pager?.currentItem = newPosition
                 }
             }
@@ -127,18 +132,16 @@ abstract class BaseTabFragment: InnerFragment, ActionBar.TabListener, ViewPager.
         }
     }
 
-    abstract fun initFragmentList(listFragment: MutableList<Fragment?>?)
+    abstract fun initFragmentList(listFragment: MutableList<Fragment>?)
 
     private fun initTab() {
         bar?.removeAllTabs()
         for (bf in listFragment!!) {
-            if (bf != null) {
-                val t = bar?.newTab()?.setText((bf as BaseFragment).tabTitle)?.setTabListener(this)
-                if ((bf as BaseFragment).tabIcon != -1) {
-                    t?.setIcon(bf.tabIcon)
-                }
-                bar?.addTab(t)
+            val t = bar?.newTab()?.setText((bf as BaseFragment).tabTitle)?.setTabListener(this)
+            if ((bf as BaseFragment).tabIcon != -1) {
+                t?.setIcon(bf.tabIcon)
             }
+            bar?.addTab(t)
         }
     }
 
@@ -150,7 +153,7 @@ abstract class BaseTabFragment: InnerFragment, ActionBar.TabListener, ViewPager.
         pager?.post { pager?.currentItem = 0 }
     }
 
-    override fun onTabReselected(tab: ActionBar.Tab?, ft: FragmentTransaction?) { }
+    override fun onTabReselected(tab: ActionBar.Tab?, ft: FragmentTransaction?) {}
 
     override fun onTabSelected(tab: ActionBar.Tab?, ft: FragmentTransaction?) {
         if (pager?.currentItem != tab!!.position) {
@@ -162,11 +165,11 @@ abstract class BaseTabFragment: InnerFragment, ActionBar.TabListener, ViewPager.
         }
     }
 
-    override fun onTabUnselected(tab: ActionBar.Tab?, ft: FragmentTransaction?) { }
+    override fun onTabUnselected(tab: ActionBar.Tab?, ft: FragmentTransaction?) {}
 
-    override fun onPageScrollStateChanged(state: Int) { }
+    override fun onPageScrollStateChanged(state: Int) {}
 
-    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixel: Int) { }
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixel: Int) {}
 
     override fun onPageSelected(position: Int) {
         try {

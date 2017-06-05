@@ -43,7 +43,6 @@ abstract class FragmentPagerAdapter: PagerAdapter {
             fragment?.setMenuVisibility(false)
             fragment?.userVisibleHint = false
         }
-
         return fragment
     }
 
@@ -89,6 +88,6 @@ abstract class FragmentPagerAdapter: PagerAdapter {
 
     fun getItemId(position: Int): Long = position.toLong()
 
-    fun makeFragmentName(viewId: Int, id: Long): String = "android:switcher:${viewId}:${id}"
+    fun makeFragmentName(viewId: Int, id: Long): String = "android:switcher:$viewId:$id"
 
 }

@@ -1,13 +1,15 @@
 package com.rarnu.base.sample
 
-import android.app.Activity
-import android.os.Bundle
+import android.app.Fragment
+import com.rarnu.base.app.BaseActivity
 
-class MainActivity : Activity() {
+class MainActivity : BaseActivity() {
+    override fun getIcon(): Int = R.drawable.ic_launcher
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-    }
+    override fun replaceFragment(): Fragment = MainFragment()
+
+    override fun customTheme(): Int = 0
+
+    override fun getActionBarCanBack(): Boolean = false
 
 }

@@ -389,7 +389,7 @@ class GifDecoder : Thread {
         } else {
             var f = _gifFrame
             while (f?.nextFrame != null) {
-                f = f?.nextFrame
+                f = f.nextFrame
             }
             if (_cacheImage) {
                 val name = getDir()

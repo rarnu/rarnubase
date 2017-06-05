@@ -45,7 +45,7 @@ object AutobootUtils {
             val ri = PackageParserUtils.Activity.fromComponent(riobj)
             if (ri!!.intents != null && ri.intents!!.size != 0) {
                 for (/* PackageParser.ActivityIntentInfo */ aiiobj in ri.intents!!) {
-                    val aii = aiiobj as IntentFilter
+                    val aii = aiiobj
                     if (aii.countActions() > 0) {
                         for (i in 0..aii.countActions() - 1) {
                             if (aii.getAction(i) == Intent.ACTION_BOOT_COMPLETED) {
@@ -77,7 +77,7 @@ object AutobootUtils {
                 val ri = PackageParserUtils.Activity.fromComponent(riobj)
                 if (ri!!.intents != null && ri.intents!!.size != 0) {
                     for (/* PackageParser.ActivityIntentInfo */ aiiobj in ri.intents!!) {
-                        val aii = aiiobj as IntentFilter
+                        val aii = aiiobj
                         if (aii.countActions() > 0) {
                             for (i in 0..aii.countActions() - 1) {
                                 if (aii.getAction(i) == Intent.ACTION_BOOT_COMPLETED) {

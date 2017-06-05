@@ -10,7 +10,7 @@ import android.view.ViewGroup
  */
 class EndlessPagerAdapter : PagerAdapter {
 
-    private var _views: MutableList<View?>? = null
+    private var _views: MutableList<View>? = null
     private var _isEndless = false
     var isEndless: Boolean
         get() = _isEndless
@@ -26,11 +26,11 @@ class EndlessPagerAdapter : PagerAdapter {
         }
     private var _count = 0
 
-    constructor(views: MutableList<View?>?) {
+    constructor(views: MutableList<View>?) {
         setNewData(views)
     }
 
-    fun setNewData(views: MutableList<View?>?) {
+    fun setNewData(views: MutableList<View>?) {
         _views = views
         _count = if (_isEndless) {
             Integer.MAX_VALUE
@@ -42,7 +42,7 @@ class EndlessPagerAdapter : PagerAdapter {
 
     override fun getCount(): Int = _count
 
-    override fun destroyItem(container: ViewGroup?, position: Int, `object`: Any?) { }
+    override fun destroyItem(container: ViewGroup?, position: Int, obj: Any?) { }
 
     override fun instantiateItem(container: ViewGroup?, position: Int): Any? {
         try {

@@ -12,10 +12,15 @@ import com.rarnu.base.app.inner.IIntf
  */
 abstract class BaseDialogFragment: Fragment(), IIntf {
 
-    protected var innerView: View? = null
+    private var _innerView: View? = null
+    protected var innerView: View
+        get() = _innerView!!
+        set(value) {
+            _innerView = value
+        }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        innerView = inflater?.inflate(getFragmentLayoutResId(), container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        innerView = inflater.inflate(getFragmentLayoutResId(), container, false)
         initComponents()
         initEvents()
         initLogic()

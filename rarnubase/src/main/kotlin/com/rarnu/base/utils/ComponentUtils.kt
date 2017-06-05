@@ -34,7 +34,7 @@ object ComponentUtils {
 
     fun parsePackageInfo(info: PackageInfo?): Any? /* PackageParser.Package */ {
         val fileAbsPath = info?.applicationInfo?.publicSourceDir
-        val ppu = PackageParserUtils(fileAbsPath)
+        val ppu = PackageParserUtils()
         val pkg = ppu.parsePackage(fileAbsPath, PackageParserUtils.PARSE_IS_SYSTEM)
         return pkg
     }
@@ -60,6 +60,86 @@ object ComponentUtils {
             info.enabled = pm.getComponentEnabledSetting(ss?.getComponentName()) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
             lstComponentInfo.add(info)
         }
+        return lstComponentInfo
+    }
+
+    fun getActivityList(ctx: Context?, pkg: Any?): MutableList<CompInfo> {
+        val lstComponentInfo = arrayListOf<CompInfo>()
+        if (ctx != null) {
+            val pm = ctx.packageManager
+            val lst = PackageParserUtils.packageActivities(pkg)
+            if (lst != null) {
+                for (a in lst) {
+                    val aa = PackageParserUtils.Activity.fromComponent(a)
+                    val info = CompInfo()
+                    info.component = aa
+                    info.fullPackageName = aa?.getComponentName()?.className
+                    info.enabled = pm.getComponentEnabledSetting(aa?.getComponentName()) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                    lstComponentInfo.add(info)
+                }
+            }
+        }
+        lstComponentInfo.sortBy { it.compName }
+        return lstComponentInfo
+    }
+
+    fun getServiceList(ctx: Context?, pkg: Any?): MutableList<CompInfo> {
+        val lstComponentInfo = arrayListOf<CompInfo>()
+        if (ctx != null) {
+            val pm = ctx.packageManager
+            val lst = PackageParserUtils.packageServices(pkg)
+            if (lst != null) {
+                for (a in lst) {
+                    val aa = PackageParserUtils.Service.fromComponent(a)
+                    val info = CompInfo()
+                    info.component = aa
+                    info.fullPackageName = aa?.getComponentName()?.className
+                    info.enabled = pm.getComponentEnabledSetting(aa?.getComponentName()) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                    lstComponentInfo.add(info)
+                }
+            }
+        }
+        lstComponentInfo.sortBy { it.compName }
+        return lstComponentInfo
+    }
+
+    fun getReceiverList(ctx: Context?, pkg: Any?): MutableList<CompInfo> {
+        val lstComponentInfo = arrayListOf<CompInfo>()
+        if (ctx != null) {
+            val pm = ctx.packageManager
+            val lst = PackageParserUtils.packageReceivers(pkg)
+            if (lst != null) {
+                for (a in lst) {
+                    val aa = PackageParserUtils.Activity.fromComponent(a)
+                    val info = CompInfo()
+                    info.component = aa
+                    info.fullPackageName = aa?.getComponentName()?.className
+                    info.enabled = pm.getComponentEnabledSetting(aa?.getComponentName()) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                    lstComponentInfo.add(info)
+                }
+            }
+        }
+        lstComponentInfo.sortBy { it.compName }
+        return lstComponentInfo
+    }
+
+    fun getProviderList(ctx: Context?, pkg: Any?): MutableList<CompInfo> {
+        val lstComponentInfo = arrayListOf<CompInfo>()
+        if (ctx != null) {
+            val pm = ctx.packageManager
+            val lst = PackageParserUtils.packageProviders(pkg)
+            if (lst != null) {
+                for (a in lst) {
+                    val aa = PackageParserUtils.Provider.fromComponent(a)
+                    val info = CompInfo()
+                    info.component = aa
+                    info.fullPackageName = aa?.getComponentName()?.className
+                    info.enabled = pm.getComponentEnabledSetting(aa?.getComponentName()) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                    lstComponentInfo.add(info)
+                }
+            }
+        }
+        lstComponentInfo.sortBy { it.compName }
         return lstComponentInfo
     }
 
@@ -91,7 +171,17 @@ object ComponentUtils {
         var position = 0
         var fullPackageName: String? = null
 
-        fun getCompName(): String? = component?.className?.substringAfterLast(".")
+        val compName: String?
+            get() = component?.className?.substringAfterLast(".")
+
+        val intents: List<String>
+            get() {
+                val result = arrayListOf<String>()
+                if (component != null && component?.intents != null) {
+                    component!!.intents!!.filter { it.countActions() > 0 }.forEach { a -> (0..a.countActions() - 1).mapTo(result) { a.getAction(it) } }
+                }
+                return result
+            }
 
         fun isActivity(): Boolean = component is PackageParserUtils.Activity
 
@@ -101,7 +191,7 @@ object ComponentUtils {
             if (pa.intents != null) {
                 if (pa.intents!!.size > 0) {
                     for (aobj in pa.intents!!) {
-                        val aii = aobj as IntentFilter
+                        val aii = aobj
                         if (aii.countActions() > 0) {
                             for (i in 0..aii.countActions() - 1) {
                                 nstr += aii.getAction(i).substringAfterLast(".").replace("_", "").toLowerCase() + "<br />"
@@ -134,6 +224,5 @@ object ComponentUtils {
         var type = -1
         var filePath: String? = null
     }
-
 
 }

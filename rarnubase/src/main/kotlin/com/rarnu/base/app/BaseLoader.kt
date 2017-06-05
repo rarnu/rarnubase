@@ -6,7 +6,7 @@ import android.content.Context
 /**
  * Created by rarnu on 3/23/16.
  */
-abstract class BaseLoader<T>(context: Context?) : AsyncTaskLoader<MutableList<T>?>(context) {
+abstract class BaseLoader<T>(context: Context) : AsyncTaskLoader<MutableList<T>?>(context) {
 
     abstract override fun loadInBackground(): MutableList<T>?
 

@@ -67,7 +67,7 @@ class RayMenu : RelativeLayout, ArcRayMenuIntf {
         _rayLayout = findViewById(R.id.item_layout) as RayLayout
         val controlLayout = findViewById(R.id.control_layout) as ViewGroup
         controlLayout.isClickable = true
-        controlLayout.setOnTouchListener { v, event ->
+        controlLayout.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 _hintView?.startAnimation(createHintSwitchAnimation(_rayLayout!!.isExpanded()))
                 _rayLayout?.switchState(true)

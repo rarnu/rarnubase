@@ -7,8 +7,8 @@ import android.view.View
  */
 interface OnScreenTouchListener {
 
-    fun onActionScrolling(v: View?)
+    fun onActionScrolling(v: View)
 
-    fun onActionReset(v: View?)
+    fun onActionReset(v: View)
 
 }
