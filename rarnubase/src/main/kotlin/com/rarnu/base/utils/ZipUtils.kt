@@ -1,9 +1,10 @@
 package com.rarnu.base.utils
 
 import android.util.Log
+import kotlin.concurrent.thread
 
 /**
- * Created by rarnu on 3/30/16.
+ * Created by rarnu on 6/8/17.
  */
 object ZipUtils {
 
@@ -39,4 +40,40 @@ object ZipUtils {
     fun getCompressStatus(filePath: String): CompressStatus = CompressStatus(filePath, getCompressFileCount(filePath), getCompressedCount(filePath), getCompressErrorCode(filePath), getCompressErrorMessage(filePath))
     fun getUncompressStatus(filePath: String): UncompressStatus = UncompressStatus(filePath, getUncompressFileCount(filePath), getUncompressedCount(filePath), getUncompressErrorCode(filePath), getUncompressErrorMessage(filePath))
 
+}
+
+class Zip {
+    var archive = ""
+    var src = ""
+    internal var _status: (ZipUtils.CompressStatus?) -> Unit = {}
+    fun onStatus(status: (ZipUtils.CompressStatus?) -> Unit) {
+        _status = status
+    }
+}
+
+class Unzip {
+    var archive = ""
+    var dest = ""
+    internal var _status: (ZipUtils.UncompressStatus?) -> Unit = {}
+    fun onStatus(status: (ZipUtils.UncompressStatus?) -> Unit) {
+        _status = status
+    }
+}
+
+fun zipAsync(init: Zip.() -> Unit) = thread { zip(init) }
+
+fun zip(init: Zip.() -> Unit) {
+    val z = Zip()
+    z.init()
+    ZipUtils.compress(z.archive, z.src)
+    z._status(ZipUtils.getCompressStatus(z.archive))
+}
+
+fun unzipAsync(init: Unzip.() -> Unit) = thread { unzip(init) }
+
+fun unzip(init: Unzip.() -> Unit) {
+    val z = Unzip()
+    z.init()
+    ZipUtils.uncompress(z.archive, z.dest)
+    z._status(ZipUtils.getUncompressStatus(z.archive))
 }

@@ -15,6 +15,7 @@ import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import kotlin.concurrent.thread
 
 /**
  * Created by rarnu on 3/27/16.
@@ -353,5 +354,59 @@ object ImageUtils {
         return null
     }
 
+}
 
+enum class ImageOperation { ROUNDCORNER, BLACKWHITE, ROTATE, FLIP, MATRIX, COLORMATRIX, ZOOM, BLUR }
+
+class ImageBitmap {
+
+    var type = ImageOperation.ROUNDCORNER
+    var bitmap: Bitmap? = null
+
+    // roundcorner
+    var radis = 0.0F
+
+    // rotate
+    var angle = 0.0F
+
+    // flip
+    var mode = 0
+
+    // matrix
+    var margin = 0
+
+    // colorMatric
+    var matrixSrc: FloatArray? = null
+
+    // zoom
+    var newWidth = 0.0F
+    var newHeight = 0.0f
+
+    // blur level
+    var blur = 0
+
+    internal var _status: (Bitmap?) -> Unit = {}
+    fun onStatus(status: (Bitmap?) -> Unit) {
+        _status = status
+    }
+}
+
+fun imageAsync(init: ImageBitmap.() -> Unit) = thread { image(init) }
+
+fun image(init: ImageBitmap.() -> Unit): Bitmap? {
+    val ib = ImageBitmap()
+    ib.init()
+    val ret: Bitmap?
+    when (ib.type) {
+        ImageOperation.ROUNDCORNER -> ret = ImageUtils.roundedCornerBitmap(ib.bitmap, ib.radis)
+        ImageOperation.BLACKWHITE -> { ret = ImageUtils.blackWhiteBmp(ib.bitmap) }
+        ImageOperation.ROTATE -> { ret = ImageUtils.rotateBmp(ib.bitmap, ib.angle) }
+        ImageOperation.FLIP -> { ret = ImageUtils.flipBmp(ib.bitmap, ib.mode) }
+        ImageOperation.MATRIX -> { ret = ImageUtils.matrixBmp(ib.bitmap, ib.margin) }
+        ImageOperation.COLORMATRIX -> { ret = ImageUtils.colorMatrixBmp(ib.bitmap, ib.matrixSrc) }
+        ImageOperation.ZOOM -> { ret = ImageUtils.zoomImage(ib.bitmap, ib.newWidth, ib.newHeight) }
+        ImageOperation.BLUR -> { ret = ImageUtils.blurBmp(ib.bitmap, ib.blur) }
+    }
+    ib._status(ret)
+    return ret
 }

@@ -1,163 +1,118 @@
 package com.rarnu.base.utils
 
 import okhttp3.*
-import java.io.*
-import java.net.URL
+import java.io.File
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 
 /**
- * Created by rarnu on 3/25/16.
+ * Created by rarnu on 6/8/17.
  */
-object HttpUtils {
 
-    data class HttpRequestResponseData(var cookie: CookieJar?, var data: String?): Serializable
+enum class HttpMethod { GET, POST, PUT, DELETE }
 
-    fun simplePostWithHeader(host: String, param: String, encoding: String, property: MutableMap<String, String>?): String {
-        val url = URL(host)
-        val conn = url.openConnection()
-        if (property != null) {
-            val iter = property.entries.iterator()
-            while (iter.hasNext()) {
-                val entry = iter.next()
-                conn.addRequestProperty(entry.key, entry.value)
-            }
-        }
-        conn.doOutput = true
-        val osw = OutputStreamWriter(conn.outputStream)
-        osw.write(param)
-        osw.flush()
-        osw.close()
-        val isr = InputStreamReader(conn.inputStream, encoding)
-        val br = BufferedReader(isr)
-        var content: String?
-        var result = ""
-        while(true) {
-            content = br.readLine()
-            if (content != null) {
-                result += "$content\n"
+class HttpUtils {
+
+    var url = ""
+    var method = HttpMethod.GET
+    var getParam = ""
+    var postParam: Map<String, String>? = null
+    var fileParam: Map<String, String>? = null
+    var cookie: CookieJar? = null
+
+    internal var _success: (Int, String?, CookieJar?) -> Unit = { _, _, _ -> }
+    internal var _fail: (Throwable?) -> Unit = {}
+
+    fun onSuccess(onSuccess: (Int, String?, CookieJar?) -> Unit) {
+        _success = onSuccess
+    }
+
+    fun onFail(onFail: (Throwable?) -> Unit) {
+        _fail = onFail
+    }
+}
+
+fun httpAsync(init: HttpUtils.() -> Unit) = thread { http(init) }
+
+fun http(init: HttpUtils.() -> Unit): String? {
+    val h = HttpUtils()
+    h.init()
+    val req = buildRequest(h)
+    return executeForResult(req, h)
+}
+
+private fun buildRequest(util: HttpUtils): Request {
+    val req: Request
+    when (util.method) {
+        HttpMethod.GET -> { req = Request.Builder().url("${util.url}?${util.getParam}").build() }
+        HttpMethod.POST -> {
+            var u = util.url
+            if (util.getParam != "") { u += "?${util.getParam}" }
+            val body: RequestBody?
+            if (util.fileParam == null) {
+                body = buildBody(util.postParam)
             } else {
-                break
+                body = buildPostFileParts(util.postParam, util.fileParam)
             }
+            req = Request.Builder().url(u).post(body).build()
         }
-        br.close()
-        isr.close()
-        return result
-    }
-
-    fun simplePost(host: String, param: String, encoding: String): String = simplePostWithHeader(host, param, encoding, null)
-
-    fun post(host: String?, getParams: String?, params: Map<String, String>?): String? {
-        val url = "$host?$getParams"
-        return post(url, params)
-    }
-
-    fun post(host: String?, params: Map<String, String>?): String? {
-        val body = buildBody(params)
-        val req = Request.Builder().url(host).post(body).build()
-        return executeForResult(req)
-    }
-
-    fun postFile(host: String?, params: Map<String, String>?, files: Map<String, String>?): String? {
-        val body = buildPostFileParts(params, files)
-        val req = Request.Builder().url(host).post(body).build()
-        return executeForResult(req)
-    }
-
-    fun postWithCookie(host: String?, params: Map<String, String>?, cookie: CookieJar?): HttpRequestResponseData? {
-        val body = buildBody(params)
-        val req = Request.Builder().url(host).post(body).build()
-        return executeForData(req, cookie)
-    }
-
-
-    fun postFileWithCookie(host: String?, params: Map<String, String>?, files: Map<String, String>?, cookie: CookieJar?): HttpRequestResponseData? {
-        val body = buildPostFileParts(params, files)
-        val req = Request.Builder().url(host).post(body).build()
-        return executeForData(req, cookie)
-    }
-
-    private fun buildPostFileParts(params: Map<String, String>?, files: Map<String, String>?): RequestBody? {
-        val builder = MultipartBody.Builder()
-        builder.setType(MultipartBody.FORM)
-        val iterParam = params!!.keys.iterator()
-        while (iterParam.hasNext()) {
-            val key = iterParam.next()
-            val value = params[key]
-            builder.addFormDataPart(key, value)
+        HttpMethod.PUT -> {
+            val body = buildBody(util.postParam)
+            req = Request.Builder().url("${util.url}?${util.getParam}").put(body).build()
         }
-        val iterFile = files!!.keys.iterator()
-        while (iterFile.hasNext()) {
-            val key = iterFile.next()
-            val file = files[key]
-            val f = File(file)
-            val fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), f)
-            builder.addFormDataPart(key, file!!.substring(file.lastIndexOf("/") + 1), fileBody)
+        HttpMethod.DELETE -> {
+            val body = buildBody(util.postParam)
+            req = Request.Builder().url("${util.url}?${util.getParam}").delete(body).build()
         }
-        return builder.build()
     }
+    return req
+}
 
-    fun get(host: String?, params: String?): String? {
-        val req = Request.Builder().url("$host?$params").build()
-        return executeForResult(req)
+private fun buildPostFileParts(params: Map<String, String>?, files: Map<String, String>?): RequestBody? {
+    val builder = MultipartBody.Builder()
+    builder.setType(MultipartBody.FORM)
+    val iterParam = params!!.keys.iterator()
+    while (iterParam.hasNext()) {
+        val key = iterParam.next()
+        val value = params[key]
+        builder.addFormDataPart(key, value)
     }
-
-    fun delete(host: String?, params: Map<String, String>?): String? {
-        val body = buildBody(params)
-        val req = Request.Builder().url(host).delete(body).build()
-        return executeForResult(req)
+    val iterFile = files!!.keys.iterator()
+    while (iterFile.hasNext()) {
+        val key = iterFile.next()
+        val file = files[key]
+        val f = File(file)
+        val fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), f)
+        builder.addFormDataPart(key, file!!.substring(file.lastIndexOf("/") + 1), fileBody)
     }
+    return builder.build()
+}
 
-    fun getWithCookie(host: String?, params: String?, cookie: CookieJar?): HttpRequestResponseData? {
-        val req = Request.Builder().url("$host?$params").build()
-        return executeForData(req, cookie)
+private fun buildBody(params: Map<String, String>?): RequestBody? {
+    val builder = FormBody.Builder()
+    val iter = params!!.keys.iterator()
+    while (iter.hasNext()) {
+        val key = iter.next()
+        val value = params[key]
+        builder.add(key, value)
     }
+    return builder.build()
+}
 
-
-    private fun buildBody(params: Map<String, String>?): RequestBody? {
-        val builder = FormBody.Builder()
-        val iter = params!!.keys.iterator()
-        while (iter.hasNext()) {
-            val key = iter.next()
-            val value = params[key]
-            builder.add(key, value)
+private fun executeForResult(req: Request?, util: HttpUtils): String? {
+    val builder = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
+    if (util.cookie != null) { builder.cookieJar(util.cookie) }
+    val http = builder.build()
+    val call = http.newCall(req)
+    var ret: String? = ""
+    try {
+        val resp = call.execute()
+        if (resp.isSuccessful) {
+            ret = resp.body()?.string()
         }
-        return builder.build()
+        util._success(resp.code(), ret, http.cookieJar())
+    } catch (e: Throwable) {
+        util._fail(e)
     }
-
-    private fun executeForResult(req: Request?): String? {
-        val http = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).build()
-        val call = http.newCall(req)
-        var ret: String? = ""
-        try {
-            val resp = call.execute()
-            if (resp.isSuccessful) {
-                ret = resp.body()?.string()
-            }
-        } catch (e: Exception) {
-
-        }
-        return ret
-    }
-
-    private fun executeForData(req: Request?, cookie: CookieJar?): HttpRequestResponseData? {
-        var data: HttpRequestResponseData? = null
-        val builder = OkHttpClient.Builder()
-        builder.connectTimeout(10, TimeUnit.SECONDS)
-        if (cookie != null) {
-            builder.cookieJar(cookie)
-        }
-        val http = builder.build()
-        val call = http.newCall(req)
-        try {
-            val resp = call.execute()
-            if (resp.isSuccessful) {
-                data = HttpRequestResponseData(http.cookieJar(), resp.body()?.string())
-            }
-        } catch (e: Exception) {
-
-        }
-        return data
-
-    }
-
+    return ret
 }

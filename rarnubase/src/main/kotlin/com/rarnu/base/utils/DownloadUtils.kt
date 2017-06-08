@@ -16,7 +16,7 @@ import java.net.URL
 /**
  * Created by rarnu on 3/27/16.
  */
-object  DownloadUtils {
+object DownloadUtils {
 
     private val listDownloading = arrayListOf<DownloadInfo>()
 
@@ -200,5 +200,26 @@ object  DownloadUtils {
             _runningCallback = callback
         }
     }
+}
 
+class Download() {
+    var imageView: ImageView? = null
+    var textView: TextView? = null
+    var url = ""
+    var localDir = ""
+    var localFile = ""
+    var handler: Handler? = null
+    var bitmapOption: BitmapFactory.Options? = null
+    var isRoundCorner = false
+    var radis = 0
+}
+
+fun downloadAsync(context: Context, init: Download.() -> Unit) {
+    val d = Download()
+    d.init()
+    if (d.textView != null) {
+        DownloadUtils.downloadFileT(context, d.imageView, d.textView, d.url, d.localDir, d.localFile)
+    } else {
+        DownloadUtils.downloadFileT(context, d.imageView, d.url, d.localDir, d.localFile, d.handler, d.bitmapOption, d.isRoundCorner, d.radis)
+    }
 }
