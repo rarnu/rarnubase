@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
@@ -156,10 +157,14 @@ class CustomViewBehind : ViewGroup {
             }
         }
 
-    constructor(context: Context) : this(context, null)
+    constructor(context: Context) : this(context, null) {
+        _marginThreshold = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MARGIN_THRESHOLD, resources.displayMetrics).toInt()
+        Log.e("rarnubase", "_marginThreshold => $_marginThreshold")
+    }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         _marginThreshold = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, MARGIN_THRESHOLD, resources.displayMetrics).toInt()
+        Log.e("rarnubase", "_marginThreshold => $_marginThreshold")
     }
 
     override fun scrollTo(x: Int, y: Int) {

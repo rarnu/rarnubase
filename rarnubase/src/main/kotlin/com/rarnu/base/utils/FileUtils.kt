@@ -421,9 +421,9 @@ object FileUtils {
         return Math.abs(size)
     }
 
-    fun loadListFromFile(path: String): MutableList<*>? = loadObjetFromFile(path) as MutableList<*>
+    fun loadListFromFile(path: String): MutableList<*>? = loadObjetFromFile(path) as MutableList<*>?
 
-    fun saveListToFile(list: MutableList<*>, path: String) = saveObjectToFile(list, path)
+    fun saveListToFile(list: MutableList<*>?, path: String) = saveObjectToFile(list, path)
 
     fun loadObjetFromFile(path: String): Any? {
         var obj: Any? = null
