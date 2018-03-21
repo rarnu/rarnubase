@@ -6,6 +6,7 @@ import android.view.Menu
 import com.rarnu.base.utils.unzipAsync
 import com.rarnu.base.utils.zipAsync
 import com.rarnu.base.app.BaseFragment
+import com.rarnu.base.utils.zip
 
 /**
  * Created by rarnu on 6/2/17.
@@ -25,7 +26,7 @@ class MainFragment: BaseFragment() {
     }
 
     override fun initLogic() {
-        zipAsync {
+        zip {
             zipPath = "/sdcard/a.zip"
             srcPath = "/sdcard/zipsample"
             success {
@@ -36,7 +37,8 @@ class MainFragment: BaseFragment() {
             }
         }
 
-        unzipAsync {
+        /*
+        unzip {
             zipPath = "/sdcard/a.zip"
             destPath = "/sdcard/unzipsample"
             success {
@@ -46,6 +48,7 @@ class MainFragment: BaseFragment() {
                 Log.e("UNZIP", "FAIL => $it")
             }
         }
+        */
 
 
         /*
