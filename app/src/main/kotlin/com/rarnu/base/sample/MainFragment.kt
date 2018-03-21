@@ -3,11 +3,9 @@ package com.rarnu.base.sample
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import com.rarnu.base.utils.unzipAsync
+import com.rarnu.base.utils.zipAsync
 import com.rarnu.base.app.BaseFragment
-import com.rarnu.base.utils.HttpMethod
-import com.rarnu.base.utils.downloadAsync
-import com.rarnu.base.utils.httpAsync
-import kotlinx.android.synthetic.main.activity_main.view.*
 
 /**
  * Created by rarnu on 6/2/17.
@@ -27,6 +25,30 @@ class MainFragment: BaseFragment() {
     }
 
     override fun initLogic() {
+        zipAsync {
+            zipPath = "/sdcard/a.zip"
+            srcPath = "/sdcard/zipsample"
+            success {
+                Log.e("ZIP", "SUCC")
+            }
+            error {
+                Log.e("ZIP", "FAIL => $it")
+            }
+        }
+
+        unzipAsync {
+            zipPath = "/sdcard/a.zip"
+            destPath = "/sdcard/unzipsample"
+            success {
+                Log.e("UNZIP", "SUCC")
+            }
+            error {
+                Log.e("UNZIP", "FAIL => $it")
+            }
+        }
+
+
+        /*
         httpAsync {
             url = "http://rarnu.xyz/yugioh/update.php"
             method = HttpMethod.GET
@@ -49,6 +71,7 @@ class MainFragment: BaseFragment() {
             localFile = "p1.png"
             imageView = innerView.imgPic
         }
+        */
     }
 
     override fun getFragmentLayoutResId(): Int = R.layout.activity_main

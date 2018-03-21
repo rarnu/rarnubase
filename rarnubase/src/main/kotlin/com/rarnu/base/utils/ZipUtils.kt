@@ -1,79 +1,133 @@
 package com.rarnu.base.utils
 
-import android.util.Log
+import org.apache.commons.compress.archivers.zip.Zip64Mode
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
+import org.apache.commons.io.IOUtils
+import java.io.*
 import kotlin.concurrent.thread
 
-/**
- * Created by rarnu on 6/8/17.
- */
-object ZipUtils {
+class ZipUtils {
 
-    val ERRORCODE_NOERROR = 0
-    val ERRORCODE_FORMAT_NOT_SUPPORT = -1
-    val ERRORCODE_UNCOMPRESS = -2
-    val ERRORCODE_COMPRESS = -3
+    var zipPath = ""
+    var srcPath = ""
+    var destPath = ""
+    internal var _success: () -> Unit = {}
+    internal var _error: (String?) -> Unit = { _ -> }
 
-    init {
-        try {
-            System.loadLibrary("compress")
-        } catch(e: Exception) {
-            Log.e("ZipUtils", "System.loadLibrary(\"compress\") => ${e.message}")
+    fun success(onSuccess: () -> Unit) {
+        _success = onSuccess
+    }
+
+    fun error(onError: (String?) -> Unit) {
+        _error = onError
+    }
+}
+
+fun zipAsync(init: ZipUtils.() -> Unit) = thread { zip(init) }
+
+fun zip(init: ZipUtils.() -> Unit) {
+    val z = ZipUtils()
+    z.init()
+    try {
+        ZipOperations.zip(z.zipPath, z.srcPath)
+        z._success()
+    } catch (e: Exception) {
+        z._error(e.message)
+    }
+}
+
+fun unzipAsync(init: ZipUtils.() -> Unit) = thread { unzip(init) }
+
+fun unzip(init: ZipUtils.() -> Unit) {
+    val z = ZipUtils()
+    z.init()
+    try {
+        ZipOperations.unzip(z.zipPath, z.destPath)
+        z._success()
+    } catch (e: Exception) {
+        z._error(e.message)
+    }
+}
+
+private object ZipOperations {
+    fun getFiles(dir: String): MutableList<String> {
+        val lstFile = arrayListOf<String>()
+        val file = File(dir)
+        val files = file.listFiles()
+        for (f in files) {
+            if (f.isDirectory) {
+                lstFile.add(f.absolutePath)
+                lstFile.addAll(getFiles(f.absolutePath))
+            } else {
+                lstFile.add(f.absolutePath)
+            }
+        }
+        return lstFile
+    }
+
+    fun getFilePathName(dir: String, path: String): String = path.replace(dir + File.separator, "").replace("\\", "/")
+
+    @Throws(Exception::class)
+    fun compressFiles(files: Array<String>?, zipPath: String, dir: String) {
+        if (files == null || files.isEmpty()) {
+            return
+        }
+        val zipFile = File(zipPath)
+        val zaos = ZipArchiveOutputStream(zipFile)
+        zaos.setUseZip64(Zip64Mode.AsNeeded)
+        for (f in files) {
+            val file = File(f)
+            val name = getFilePathName(dir, f)
+            val zipEntry = ZipArchiveEntry(file, name)
+            zaos.putArchiveEntry(zipEntry)
+            if (file.isDirectory) continue
+            val bis = BufferedInputStream(FileInputStream(file))
+
+            IOUtils.copy(bis, zaos)
+            zaos.closeArchiveEntry()
+            bis.close()
+        }
+        zaos.close()
+    }
+
+    @Throws(Exception::class)
+    fun zip(zipPath: String, dir: String) {
+        val paths = getFiles(dir)
+        compressFiles(paths.toTypedArray(), zipPath, dir)
+    }
+
+    @Throws(Exception::class)
+    fun unzip(zipPath: String, saveDir: String) {
+        var saveFileDir = saveDir
+        if (!saveFileDir.endsWith("\\") && !saveFileDir.endsWith("/")) {
+            saveFileDir += File.separator
+        }
+        val dir = File(saveFileDir)
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        val file = File(zipPath)
+        if (file.exists()) {
+            val fis = FileInputStream(file)
+            val zais = ZipArchiveInputStream(fis)
+            while (true) {
+                val archiveEntry = zais.nextEntry ?: break
+                val entryFileName = archiveEntry.name
+                val entryFilePath = saveFileDir + entryFileName
+                val entryFile = File(entryFilePath)
+                if (entryFileName.endsWith(File.separator)) {
+                    entryFile.mkdirs()
+                } else {
+                    val bos = BufferedOutputStream(FileOutputStream(entryFile))
+                    IOUtils.copy(zais, bos)
+                    bos.close()
+                }
+            }
+
+            fis.close()
+            zais.close()
         }
     }
-
-    external fun uncompress(filePath: String, dest: String): Int
-    external fun compress(filePath: String, src: String): Int
-    external fun getFileSize(path: String): String
-
-    external fun getCompressErrorCode(filePath: String): Int
-    external fun getCompressErrorMessage(filePath: String): String
-    external fun getCompressFileCount(filePath: String): Int
-
-    external fun getCompressedCount(filePath: String): Int
-    external fun getUncompressErrorCode(filePath: String): Int
-    external fun getUncompressErrorMessage(filePath: String): String
-    external fun getUncompressFileCount(filePath: String): Int
-    external fun getUncompressedCount(filePath: String): Int
-
-    data class CompressStatus(var filePath: String?, var fileCount: Int, var compressCount: Int, var errCode: Int, var errMsg: String?)
-    data class UncompressStatus(var filePath: String?, var fileCount: Int, var uncompressCount: Int, var errCode: Int, var errMsg: String?)
-    fun getCompressStatus(filePath: String): CompressStatus = CompressStatus(filePath, getCompressFileCount(filePath), getCompressedCount(filePath), getCompressErrorCode(filePath), getCompressErrorMessage(filePath))
-    fun getUncompressStatus(filePath: String): UncompressStatus = UncompressStatus(filePath, getUncompressFileCount(filePath), getUncompressedCount(filePath), getUncompressErrorCode(filePath), getUncompressErrorMessage(filePath))
-
-}
-
-class Zip {
-    var archive = ""
-    var src = ""
-    internal var _status: (ZipUtils.CompressStatus?) -> Unit = {}
-    fun onStatus(status: (ZipUtils.CompressStatus?) -> Unit) {
-        _status = status
-    }
-}
-
-class Unzip {
-    var archive = ""
-    var dest = ""
-    internal var _status: (ZipUtils.UncompressStatus?) -> Unit = {}
-    fun onStatus(status: (ZipUtils.UncompressStatus?) -> Unit) {
-        _status = status
-    }
-}
-
-fun zipAsync(init: Zip.() -> Unit) = thread { zip(init) }
-
-fun zip(init: Zip.() -> Unit) {
-    val z = Zip()
-    z.init()
-    ZipUtils.compress(z.archive, z.src)
-    z._status(ZipUtils.getCompressStatus(z.archive))
-}
-
-fun unzipAsync(init: Unzip.() -> Unit) = thread { unzip(init) }
-
-fun unzip(init: Unzip.() -> Unit) {
-    val z = Unzip()
-    z.init()
-    ZipUtils.uncompress(z.archive, z.dest)
-    z._status(ZipUtils.getUncompressStatus(z.archive))
 }
