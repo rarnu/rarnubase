@@ -56,12 +56,12 @@ private object ZipOperations {
         val lstFile = arrayListOf<String>()
         val file = File(dir)
         val files = file.listFiles()
-        for (f in files) {
-            if (f.isDirectory) {
-                lstFile.add(f.absolutePath)
-                lstFile.addAll(getFiles(f.absolutePath))
+        files.filter { it.name != ".tmp" }.forEach {
+            if (it.isDirectory) {
+                lstFile.add(it.absolutePath)
+                lstFile.addAll(getFiles(it.absolutePath))
             } else {
-                lstFile.add(f.absolutePath)
+                lstFile.add(it.absolutePath)
             }
         }
         return lstFile
