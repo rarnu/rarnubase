@@ -14,7 +14,7 @@ import android.widget.SearchView
  */
 object UIUtils {
 
-    val ACTIONBAR_HEIGHT = android.R.attr.actionBarSize
+    const val ACTIONBAR_HEIGHT = android.R.attr.actionBarSize
     private var context: Context? = null
     var dm: DisplayMetrics? = null
     var isFollowSystemBackground = false

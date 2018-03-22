@@ -5,16 +5,16 @@ package com.rarnu.base.app.common
  */
 object Actions {
 
-    val ACTION_NOTIFY = "com.rarnu.base.notify"
-    val ACTION_NOTIFY_NULL = "com.rarnu.base.notify.null"
-    val ACTION_SCROLL_MESSAGE = "com.rarnu.base.scroll.message"
+    const val ACTION_NOTIFY = "com.rarnu.base.notify"
+    const val ACTION_NOTIFY_NULL = "com.rarnu.base.notify.null"
+    const val ACTION_SCROLL_MESSAGE = "com.rarnu.base.scroll.message"
 
-    val WHAT_COPY_START = 1
-    val WHAT_COPY_PROGRESS = 2
-    val WHAT_COPY_FINISH = 3
+    const val WHAT_COPY_START = 1
+    const val WHAT_COPY_PROGRESS = 2
+    const val WHAT_COPY_FINISH = 3
 
-    val WHAT_DOWNLOAD_START = 1
-    val WHAT_DOWNLOAD_PROGRESS = 2
-    val WHAT_DOWNLOAD_FINISH = 3
+    const val WHAT_DOWNLOAD_START = 1
+    const val WHAT_DOWNLOAD_PROGRESS = 2
+    const val WHAT_DOWNLOAD_FINISH = 3
 
 }

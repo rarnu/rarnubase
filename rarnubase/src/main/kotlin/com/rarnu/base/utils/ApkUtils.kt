@@ -27,18 +27,14 @@ object ApkUtils {
     val INSTALL_INTERNAL = 1
     val INSTALL_SDCARD = 2
 
-    fun getLauncherPackageName(context: Context): MutableList<String?>? {
-        var ret: MutableList<String?>? = null
+    fun getLauncherPackageName(context: Context): MutableList<String>? {
+        var ret: MutableList<String>? = null
         val inLauncher = Intent(Intent.ACTION_MAIN)
         inLauncher.addCategory(Intent.CATEGORY_HOME)
         val list = context.packageManager.queryIntentActivities(inLauncher, 0)
         if (list != null && list.size != 0) {
-            ret = arrayListOf<String?>()
-            for (ri in list) {
-                if (ri.activityInfo != null) {
-                    ret.add(ri.activityInfo.packageName)
-                }
-            }
+            ret = arrayListOf()
+            list.filter { it.activityInfo != null }.mapTo(ret) { it.activityInfo.packageName }
         }
         return ret
     }
@@ -111,12 +107,12 @@ object ApkUtils {
         return result.error
     }
 
-    fun getIconFromPackage(context: Context, info: ApplicationInfo): Drawable? = getIconFromPackageFile(context, info)
+    fun getIconFromPackage(context: Context, info: ApplicationInfo) = getIconFromPackageFile(context, info)
 
     fun getIconFromPackage(context: Context, archiveFilePath: String): Drawable? {
-        val ppu = PackageParserUtils()
-        val /* PackageParser.Package */ pkg = ppu.parsePackage(archiveFilePath, 0) ?: return null
-        val info = PackageParserUtils.packageApplicationInfo(pkg)
+        val parser = PackageParserP.newPackageParser()
+        val /* PackageParser.Package */ pkg = parser?.parsePackage(archiveFilePath, 0) ?: return null
+        val info = pkg.applicationInfo
         val pRes = context.resources
         val assmgr = context.assets
         val amu = AssetManagerUtils(assmgr)
@@ -147,7 +143,7 @@ object ApkUtils {
         }
     }
 
-    fun getLabelFromPackage(context: Context, info: ApplicationInfo): String? = getLabelFromPackageFile(context, info)
+    fun getLabelFromPackage(context: Context, info: ApplicationInfo) = getLabelFromPackageFile(context, info)
 
     fun getLabelFromPackageFile(context: Context, info: ApplicationInfo): String? {
         var res = context.resources
@@ -183,16 +179,16 @@ object ApkUtils {
         var info: ApplicationInfo? = null
         val /* PackageParser.Package */ pkg = getPackageInfoFromPackage(filePath, false)
         if (pkg != null) {
-            info = PackageParserUtils.packageApplicationInfo(pkg)
+            info = pkg.applicationInfo
         }
         return info
     }
 
     fun getPackageInfoFromPackage(filePath: String, collectSignature: Boolean): Any? /* PackageParser.Package */ {
-        val ppu = PackageParserUtils()
-        val /* PackageParser.Package */ pkg = ppu.parsePackage(filePath, 0)
+        val parser = PackageParserP.newPackageParser()
+        val pkg = parser?.parsePackage(filePath, 0)
         if (pkg != null && collectSignature) {
-            ppu.packageCollectCertificates(pkg, 0)
+            parser.collectCertificates(pkg, 0)
         }
         return pkg
     }
@@ -206,7 +202,7 @@ object ApkUtils {
 
         }
         var position = 0
-        if (packs != null && packs.size != 0) {
+        if (packs != null && packs.isNotEmpty()) {
             for (p in packs) {
                 val newInfo = p?.applicationInfo ?: continue
                 if ((includeSystem && (newInfo.sourceDir.contains("/system/app/") || (newInfo.sourceDir.contains("/system/priv-app/")))) || newInfo.sourceDir.contains("/data/app/")) {
@@ -224,30 +220,30 @@ object ApkUtils {
     }
 
     fun uninstallApk(packageName: String): Boolean {
-        try {
+        return try {
             val cmdRet = Command.runCommand("pm uninstall $packageName", true, null)
-            return cmdRet.error == ""
+            cmdRet.error == ""
         } catch (e: Exception) {
-            return false
+            false
         }
     }
 
     fun applicationInstalled(context: Context, namespace: String): Boolean {
-        try {
+        return try {
             val info = context.packageManager.getPackageInfo(namespace, 0)
-            return info != null
+            info != null
         } catch (e: PackageManager.NameNotFoundException) {
-            return false
+            false
         }
     }
 
     fun startApplication(namespace: String, activity: String): Boolean {
-        try {
+        return try {
             val cmd = "am start -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -n $namespace/$activity"
             Runtime.getRuntime().exec(cmd)
-            return true
+            true
         } catch (e: Exception) {
-            return false
+            false
         }
     }
 
@@ -311,11 +307,9 @@ object ApkUtils {
         return ret
     }
 
-    fun scanApksInSdcard(callback: OnCommandExecutionListener?) {
-        thread {
-            val cmd = "busybox find /sdcard/ -name \"*.apk\""
-            Command.runCommand(cmd, true, callback)
-        }
+    fun scanApksInSdcard(callback: OnCommandExecutionListener?) = thread {
+        val cmd = "busybox find /sdcard/ -name \"*.apk\""
+        Command.runCommand(cmd, true, callback)
     }
 
     fun isAppInstalled(context: Context, packageName: String): Boolean {

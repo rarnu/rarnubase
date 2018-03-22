@@ -97,7 +97,7 @@ abstract class InnerAdapter<T, H> : BaseAdapter, Filterable {
         override fun performFiltering(prefix: CharSequence?): FilterResults? {
             list = listFull
             val results = FilterResults()
-            if (prefix == null || prefix.length == 0) {
+            if (prefix == null || prefix.isEmpty()) {
                 synchronized (lock) {
                     val l = list
                     results.values = l
@@ -109,7 +109,7 @@ abstract class InnerAdapter<T, H> : BaseAdapter, Filterable {
                 val count = values!!.size
                 val newValues = arrayListOf<T>()
 
-                for (i in 0..count - 1) {
+                for (i in 0 until count) {
                     val value = values[i]
                     val valueText = getValueText(value)
                     if (valueText?.indexOf(prefixString) != -1) {

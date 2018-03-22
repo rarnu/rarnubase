@@ -3,7 +3,6 @@ package com.rarnu.base.utils
 import android.app.ActivityManager
 import android.content.ComponentName
 import android.content.Context
-import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -15,49 +14,46 @@ import com.rarnu.base.command.Command
 object ComponentUtils {
 
     fun enabledComponent(context: Context, receiverName: ComponentName?): Boolean {
-        try {
+        return try {
             Command.runCommand("pm enable '${receiverName?.packageName}/${receiverName?.className}'", true, null)
-            return context.packageManager.getComponentEnabledSetting(receiverName) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+            context.packageManager.getComponentEnabledSetting(receiverName) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
         } catch (t: Throwable) {
-            return false
+            false
         }
     }
 
     fun disableComponent(context: Context, receiverName: ComponentName?): Boolean {
-        try {
+        return try {
             Command.runCommand("pm disable '${receiverName?.packageName}/${receiverName?.className}'", true, null)
-            return context.packageManager.getComponentEnabledSetting(receiverName) == PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+            context.packageManager.getComponentEnabledSetting(receiverName) == PackageManager.COMPONENT_ENABLED_STATE_DISABLED
         } catch (t: Throwable) {
-            return false
+            false
         }
     }
 
     fun parsePackageInfo(info: PackageInfo?): Any? /* PackageParser.Package */ {
         val fileAbsPath = info?.applicationInfo?.publicSourceDir
-        val ppu = PackageParserUtils()
-        val pkg = ppu.parsePackage(fileAbsPath, PackageParserUtils.PARSE_IS_SYSTEM)
-        return pkg
+        val parser = PackageParserP.newPackageParser()
+        return parser?.parsePackage(fileAbsPath!!, PackageParserP.PARSE_IS_SYSTEM)
     }
 
     fun getPackageRSList(context: Context, /* PackageParser.Package */ pkg: Any?): MutableList<CompInfo?>? {
         val lstComponentInfo = arrayListOf<CompInfo?>()
         val pm = context.packageManager
-        val lstReceiver = PackageParserUtils.packageReceivers(pkg)
+        val lstReceiver = pkg?.receivers
         for (/* PackageParser.Activity */ a in lstReceiver!!) {
-            val aa = PackageParserUtils.Activity.fromComponent(a)
             val info = CompInfo()
-            info.component = aa
-            info.fullPackageName = aa?.getComponentName()?.className
-            info.enabled = pm.getComponentEnabledSetting(aa?.getComponentName()) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+            info.component = a
+            info.fullPackageName = a.componentName?.className
+            info.enabled = pm.getComponentEnabledSetting(a.componentName) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
             lstComponentInfo.add(info)
         }
-        val lstService = PackageParserUtils.packageServices(pkg)
+        val lstService = pkg.services
         for (/* PackageParser.Service */ s in lstService!!) {
-            val ss = PackageParserUtils.Service.fromComponent(s)
             val info = CompInfo()
-            info.component = ss
-            info.fullPackageName = ss?.getComponentName()?.className
-            info.enabled = pm.getComponentEnabledSetting(ss?.getComponentName()) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+            info.component = s
+            info.fullPackageName = s.componentName?.className
+            info.enabled = pm.getComponentEnabledSetting(s.componentName) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
             lstComponentInfo.add(info)
         }
         return lstComponentInfo
@@ -67,14 +63,13 @@ object ComponentUtils {
         val lstComponentInfo = arrayListOf<CompInfo>()
         if (ctx != null) {
             val pm = ctx.packageManager
-            val lst = PackageParserUtils.packageActivities(pkg)
+            val lst = pkg?.activities
             if (lst != null) {
                 for (a in lst) {
-                    val aa = PackageParserUtils.Activity.fromComponent(a)
                     val info = CompInfo()
-                    info.component = aa
-                    info.fullPackageName = aa?.getComponentName()?.className
-                    info.enabled = pm.getComponentEnabledSetting(aa?.getComponentName()) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                    info.component = a
+                    info.fullPackageName = a.componentName?.className
+                    info.enabled = pm.getComponentEnabledSetting(a.componentName) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
                     lstComponentInfo.add(info)
                 }
             }
@@ -87,14 +82,13 @@ object ComponentUtils {
         val lstComponentInfo = arrayListOf<CompInfo>()
         if (ctx != null) {
             val pm = ctx.packageManager
-            val lst = PackageParserUtils.packageServices(pkg)
+            val lst = pkg?.services
             if (lst != null) {
                 for (a in lst) {
-                    val aa = PackageParserUtils.Service.fromComponent(a)
                     val info = CompInfo()
-                    info.component = aa
-                    info.fullPackageName = aa?.getComponentName()?.className
-                    info.enabled = pm.getComponentEnabledSetting(aa?.getComponentName()) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                    info.component = a
+                    info.fullPackageName = a.componentName?.className
+                    info.enabled = pm.getComponentEnabledSetting(a.componentName) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
                     lstComponentInfo.add(info)
                 }
             }
@@ -107,14 +101,13 @@ object ComponentUtils {
         val lstComponentInfo = arrayListOf<CompInfo>()
         if (ctx != null) {
             val pm = ctx.packageManager
-            val lst = PackageParserUtils.packageReceivers(pkg)
+            val lst = pkg?.receivers
             if (lst != null) {
                 for (a in lst) {
-                    val aa = PackageParserUtils.Activity.fromComponent(a)
                     val info = CompInfo()
-                    info.component = aa
-                    info.fullPackageName = aa?.getComponentName()?.className
-                    info.enabled = pm.getComponentEnabledSetting(aa?.getComponentName()) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                    info.component = a
+                    info.fullPackageName = a.componentName?.className
+                    info.enabled = pm.getComponentEnabledSetting(a.componentName) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
                     lstComponentInfo.add(info)
                 }
             }
@@ -127,14 +120,13 @@ object ComponentUtils {
         val lstComponentInfo = arrayListOf<CompInfo>()
         if (ctx != null) {
             val pm = ctx.packageManager
-            val lst = PackageParserUtils.packageProviders(pkg)
+            val lst = pkg?.providers
             if (lst != null) {
                 for (a in lst) {
-                    val aa = PackageParserUtils.Provider.fromComponent(a)
                     val info = CompInfo()
-                    info.component = aa
-                    info.fullPackageName = aa?.getComponentName()?.className
-                    info.enabled = pm.getComponentEnabledSetting(aa?.getComponentName()) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                    info.component = a
+                    info.fullPackageName = a.componentName?.className
+                    info.enabled = pm.getComponentEnabledSetting(a.componentName) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED
                     lstComponentInfo.add(info)
                 }
             }
@@ -143,30 +135,21 @@ object ComponentUtils {
         return lstComponentInfo
     }
 
-    fun getPackageComponentName(/* PackageParser.Component<?> */ comp: Any?): ComponentName? {
-        return (comp as PackageParserUtils.Component).getComponentName()
-    }
+    fun getPackageComponentName(/* PackageParser.Component<?> */ comp: Any?) = comp?.componentName
 
     fun isServiceRunning(context: Context, className: String?): Boolean {
-        var isRunning = false
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val serviceList = activityManager.getRunningServices(30)
         if (serviceList.size <= 0) {
             return false
         }
-        for (si in serviceList) {
-            if (si.service.className == className) {
-                isRunning = true
-                break
-            }
-        }
-        return isRunning
+        return serviceList.any { it.service.className == className }
     }
 
 
     class CompInfo {
 
-        var component: PackageParserUtils.Component? = null /* PackageParser.Component<?> */
+        var component: Any? = null /* PackageParser.Component<?> */
         var enabled = false
         var position = 0
         var fullPackageName: String? = null
@@ -178,23 +161,20 @@ object ComponentUtils {
             get() {
                 val result = arrayListOf<String>()
                 if (component != null && component?.intents != null) {
-                    component!!.intents!!.filter { it.countActions() > 0 }.forEach { a -> (0..a.countActions() - 1).mapTo(result) { a.getAction(it) } }
+                    component!!.intents!!.filter { it.countActions() > 0 }.forEach { a -> (0 until a.countActions()).mapTo(result) { a.getAction(it) } }
                 }
                 return result
             }
 
-        fun isActivity(): Boolean = component is PackageParserUtils.Activity
-
         fun appendIntents(str: String?): String? {
             var nstr = str
-            val pa = component as PackageParserUtils.Activity
+            val pa = component!!
             if (pa.intents != null) {
-                if (pa.intents!!.size > 0) {
+                if (pa.intents!!.isNotEmpty()) {
                     for (aobj in pa.intents!!) {
-                        val aii = aobj
-                        if (aii.countActions() > 0) {
-                            for (i in 0..aii.countActions() - 1) {
-                                nstr += aii.getAction(i).substringAfterLast(".").replace("_", "").toLowerCase() + "<br />"
+                        if (aobj.countActions() > 0) {
+                            for (i in 0 until aobj.countActions()) {
+                                nstr += aobj.getAction(i).substringAfterLast(".").replace("_", "").toLowerCase() + "<br />"
                             }
                         }
                     }
@@ -205,7 +185,7 @@ object ComponentUtils {
 
         fun isServiceRunning(context: Context): Boolean {
             var ret = false
-            if (!isActivity()) {
+            if (!component!!.isActivity) {
                 ret = isServiceRunning(context, component?.className)
             }
             return ret

@@ -40,20 +40,18 @@ object AutobootUtils {
     fun switchAutoboot(context: Context, info: AutobootInfo?, enabled: Boolean): Boolean {
         var ret = true
         val /* PackageParser.Package */ pkg = ComponentUtils.parsePackageInfo(info?.info)
-        val receivers = PackageParserUtils.packageReceivers(pkg)
+        val receivers = pkg?.receivers
         for (/* PackageParser.Activity */ riobj in receivers!!) {
-            val ri = PackageParserUtils.Activity.fromComponent(riobj)
-            if (ri!!.intents != null && ri.intents!!.size != 0) {
-                for (/* PackageParser.ActivityIntentInfo */ aiiobj in ri.intents!!) {
-                    val aii = aiiobj
-                    if (aii.countActions() > 0) {
-                        for (i in 0..aii.countActions() - 1) {
-                            if (aii.getAction(i) == Intent.ACTION_BOOT_COMPLETED) {
-                                var operatingResult: Boolean
-                                if (enabled) {
-                                    operatingResult = ComponentUtils.enabledComponent(context, ri.getComponentName())
+
+            if (riobj.intents != null && riobj.intents!!.isNotEmpty()) {
+                for (/* PackageParser.ActivityIntentInfo */ aiiobj in riobj.intents!!) {
+                    if (aiiobj.countActions() > 0) {
+                        for (i in 0 until aiiobj.countActions()) {
+                            if (aiiobj.getAction(i) == Intent.ACTION_BOOT_COMPLETED) {
+                                val operatingResult: Boolean = if (enabled) {
+                                    ComponentUtils.enabledComponent(context, riobj.componentName)
                                 } else {
-                                    operatingResult = ComponentUtils.disableComponent(context, ri.getComponentName())
+                                    ComponentUtils.disableComponent(context, riobj.componentName)
                                 }
                                 if (!operatingResult) {
                                     ret = false
@@ -72,16 +70,14 @@ object AutobootUtils {
         var ret = -1
         try {
             val /* PackageParser.Package */ pkg = ComponentUtils.parsePackageInfo(info)
-            val receivers = PackageParserUtils.packageReceivers(pkg)
+            val receivers = pkg?.receivers
             for (/* PackageParser.Activity */ riobj in receivers!!) {
-                val ri = PackageParserUtils.Activity.fromComponent(riobj)
-                if (ri!!.intents != null && ri.intents!!.size != 0) {
-                    for (/* PackageParser.ActivityIntentInfo */ aiiobj in ri.intents!!) {
-                        val aii = aiiobj
-                        if (aii.countActions() > 0) {
-                            for (i in 0..aii.countActions() - 1) {
-                                if (aii.getAction(i) == Intent.ACTION_BOOT_COMPLETED) {
-                                    val cn = ri.getComponentName()
+                if (riobj.intents != null && riobj.intents!!.isNotEmpty()) {
+                    for (/* PackageParser.ActivityIntentInfo */ aiiobj in riobj.intents!!) {
+                        if (aiiobj.countActions() > 0) {
+                            for (i in 0 until aiiobj.countActions()) {
+                                if (aiiobj.getAction(i) == Intent.ACTION_BOOT_COMPLETED) {
+                                    val cn = riobj.componentName
                                     ret = if (context.packageManager.getComponentEnabledSetting(cn) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED) 1 else 0
                                     break
                                 }
