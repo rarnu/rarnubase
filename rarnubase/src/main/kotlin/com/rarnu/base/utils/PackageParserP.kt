@@ -1,5 +1,17 @@
 package com.rarnu.base.utils
 
+import android.util.Log
+
+typealias PackageParser = Any
+typealias Package = Any
+typealias Activity = Any
+typealias Service = Any
+typealias Provider = Any
+typealias Permission = Any
+typealias PermissionGroup = Any
+typealias Instrumentation = Any
+typealias Component = Any
+
 object PackageParserP {
 
     const val PARSE_IS_SYSTEM = 1 shl 0
@@ -14,15 +26,15 @@ object PackageParserP {
     const val PARSE_TRUSTED_OVERLAY = 1 shl 9
     const val PARSE_ENFORCE_CODE = 1 shl 10
 
-    fun newPackageParser(): Any? {
-        var ret: Any? = null
+    fun newPackageParser(): PackageParser? {
+        var ret: PackageParser? = null
         try {
             val cPackageParser = Class.forName("android.content.pm.PackageParser")
             val mConstructor = cPackageParser.getDeclaredConstructor()
             mConstructor.isAccessible = true
             ret = mConstructor.newInstance()
-        } catch (e: Exception) {
-
+        } catch (e: Throwable) {
+            Log.e("PARSE", "${e.message}")
         }
         return ret
     }

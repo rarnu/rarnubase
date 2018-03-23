@@ -185,8 +185,10 @@ object ComponentUtils {
 
         fun isServiceRunning(context: Context): Boolean {
             var ret = false
-            if (!component!!.isActivity) {
+            try {
                 ret = isServiceRunning(context, component?.className)
+            } catch (e: Throwable) {
+
             }
             return ret
         }

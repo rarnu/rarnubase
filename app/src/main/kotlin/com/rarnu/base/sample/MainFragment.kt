@@ -32,25 +32,22 @@ class MainFragment : BaseFragment() {
             val parser = PackageParserP.newPackageParser()
             val p = parser?.parsePackage(File(activity.filesDir, "a.apk"), 0)
             if (p != null) {
-                if (p.isPackage) {
-                    Log.e(tag, "p.packageName => ${p.packageName}")
-                    Log.e(tag, "p.splitNames => ${p.splitNames}")
-                    Log.e(tag, "p.volumeUuid => ${p.volumeUuid}")
-                    Log.e(tag, "p.codePath => ${p.codePath}")
-                    Log.e(tag, "p.baseCodePath => ${p.baseCodePath}")
-                    Log.e(tag, "p.splitCodePaths => ${p.splitCodePaths}")
-                    Log.e(tag, "p.baseRevisionCode => ${p.baseRevisionCode}")
-                    Log.e(tag, "p.splitRevisionCodes => ${p.splitRevisionCodes}")
-                    Log.e(tag, "p.splitFlags => ${p.splitFlags}")
-                    Log.e(tag, "p.splitPrivateFlags => ${p.splitPrivateFlags}")
-                    Log.e(tag, "p.baseHardwareAccelerated => ${p.baseHardwareAccelerated}")
-                    p.activities?.forEach { Log.e(tag, "p.activity => ${it.className}") }
-                    p.services?.forEach { Log.e(tag, "p.service => ${it.className}") }
-                    p.receivers?.forEach { Log.e(tag, "p.receiver => ${it.className}") }
-                    p.providers?.forEach { Log.e(tag, "p.provider => ${it.className}") }
-                    p.permissions?.forEach { Log.e(tag, "p.permission => ${it.permissionInfo}") }
-
-                }
+                Log.e(tag, "p.packageName => ${p.packageName}")
+                Log.e(tag, "p.splitNames => ${p.splitNames}")
+                Log.e(tag, "p.volumeUuid => ${p.volumeUuid}")
+                Log.e(tag, "p.codePath => ${p.codePath}")
+                Log.e(tag, "p.baseCodePath => ${p.baseCodePath}")
+                Log.e(tag, "p.splitCodePaths => ${p.splitCodePaths}")
+                Log.e(tag, "p.baseRevisionCode => ${p.baseRevisionCode}")
+                Log.e(tag, "p.splitRevisionCodes => ${p.splitRevisionCodes}")
+                Log.e(tag, "p.splitFlags => ${p.splitFlags}")
+                Log.e(tag, "p.splitPrivateFlags => ${p.splitPrivateFlags}")
+                Log.e(tag, "p.baseHardwareAccelerated => ${p.baseHardwareAccelerated}")
+                p.activities?.forEach { Log.e(tag, "p.activity => ${it.className}") }
+                p.services?.forEach { Log.e(tag, "p.service => ${it.className}") }
+                p.receivers?.forEach { Log.e(tag, "p.receiver => ${it.className}") }
+                p.providers?.forEach { Log.e(tag, "p.provider => ${it.className}") }
+                p.permissions?.forEach { Log.e(tag, "p.permission => ${it.permissionInfo}") }
             }
         }
 

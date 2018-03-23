@@ -15,28 +15,10 @@ import java.io.File
  * ******************************************
  */
 
-val Any.isPackageParser: Boolean
-    get() {
-        var ret = false
-        try {
-            val cPackage = Class.forName("android.content.pm.PackageParser")
-            val cThis = javaClass
-            ret = cPackage == cThis
-        } catch (e: Exception) {
+fun PackageParser.parsePackage(path: String, flag: Int) = parsePackage(File(path), flag)
 
-        }
-        return ret
-    }
-
-// ==============================================================
-// All methods here must be called when "isPackageParser" equals true.
-// ==============================================================
-
-
-fun Any.parsePackage(path: String, flag: Int) = parsePackage(File(path), flag)
-
-fun Any.parsePackage(file: File, flag: Int): Any? {
-    var ret: Any? = null
+fun PackageParser.parsePackage(file: File, flag: Int): Package? {
+    var ret: Package? = null
     try {
         val mParse = javaClass.getDeclaredMethod("parsePackage", File::class.java, Integer.TYPE)
         mParse?.isAccessible = true
@@ -47,7 +29,7 @@ fun Any.parsePackage(file: File, flag: Int): Any? {
     return ret
 }
 
-fun Any.collectCertificates(pkg: Any, parseFlags: Int) {
+fun PackageParser.collectCertificates(pkg: Package, parseFlags: Int) {
     try {
         val cPackage = Class.forName("android.content.pm.PackageParser\$Package")
         val mCollectCertificates = javaClass.getDeclaredMethod("collectCertificates", cPackage, Int::class.java)
@@ -66,177 +48,158 @@ fun Any.collectCertificates(pkg: Any, parseFlags: Int) {
  * ******************************************
  */
 
-val Any.isPackage: Boolean
-    get() {
-        var ret = false
-        try {
-            val cPackage = Class.forName("android.content.pm.PackageParser\$Package")
-            val cThis = javaClass
-            ret = cPackage == cThis
-        } catch (e: Exception) {
-
-        }
-        return ret
-    }
-
-// ==============================================================
-// All methods here must be called when "isPackage" equals true.
-// ==============================================================
-
-val Any.applicationInfo: ApplicationInfo?
+val Package.applicationInfo: ApplicationInfo?
     get() = PackageParserRef.getObjectValue(this, "applicationInfo") as ApplicationInfo?
 
-val Any.packageName: String?
+val Package.packageName: String?
     get() = PackageParserRef.getStringValue(this, "packageName")
 
-val Any.splitNames: Array<String>?
+val Package.splitNames: Array<String>?
     get() = PackageParserRef.getStringArrayValue(this, "splitNames")
 
-val Any.volumeUuid: String?
+val Package.volumeUuid: String?
     get() = PackageParserRef.getStringValue(this, "volumeUuid")
 
-val Any.codePath: String?
+val Package.codePath: String?
     get() = PackageParserRef.getStringValue(this, "codePath")
 
-val Any.baseCodePath: String?
+val Package.baseCodePath: String?
     get() = PackageParserRef.getStringValue(this, "baseCodePath")
 
-val Any.splitCodePaths: Array<String>?
+val Package.splitCodePaths: Array<String>?
     get() = PackageParserRef.getStringArrayValue(this, "splitCodePaths")
 
-val Any.baseRevisionCode: Int
+val Package.baseRevisionCode: Int
     get() = PackageParserRef.getIntValue(this, "baseRevisionCode", -1)
 
-val Any.splitRevisionCodes: IntArray?
+val Package.splitRevisionCodes: IntArray?
     get() = PackageParserRef.getIntArrayValue(this, "splitRevisionCodes")
 
-val Any.splitFlags: IntArray?
+val Package.splitFlags: IntArray?
     get() = PackageParserRef.getIntArrayValue(this, "splitFlags")
 
-val Any.splitPrivateFlags: IntArray?
+val Package.splitPrivateFlags: IntArray?
     get() = PackageParserRef.getIntArrayValue(this, "splitPrivateFlags")
 
-val Any.baseHardwareAccelerated: Boolean
+val Package.baseHardwareAccelerated: Boolean
     get() = PackageParserRef.getBooleanValue(this, "baseHardwareAccelerated", false)
 
 /**
  * @return Package
  */
-val Any.parentPackage: Any?
+val Package.parentPackage: Package?
     get() = PackageParserRef.getObjectValue(this, "parentPackage")
 
 /**
  * @return List<Package>
  */
-val Any.childPackages: List<Any>?
+val Package.childPackages: List<Package>?
     get() = PackageParserRef.getObjectListValue(this, "childPackages")
 
-val Any.staticSharedLibName: String?
+val Package.staticSharedLibName: String?
     get() = PackageParserRef.getStringValue(this, "staticSharedLibName")
 
-val Any.staticSharedLibVersion: Int
+val Package.staticSharedLibVersion: Int
     get() = PackageParserRef.getIntValue(this, "staticSharedLibVersion", 0)
 
-val Any.usesStaticLibrariesVersions: IntArray?
+val Package.usesStaticLibrariesVersions: IntArray?
     get() = PackageParserRef.getIntArrayValue(this, "usesStaticLibrariesVersions")
 
-val Any.usesStaticLibrariesCertDigests: Array<String>?
+val Package.usesStaticLibrariesCertDigests: Array<String>?
     get() = PackageParserRef.getStringArrayValue(this, "usesStaticLibrariesCertDigests")
 
-val Any.usesLibraryFiles: Array<String>?
+val Package.usesLibraryFiles: Array<String>?
     get() = PackageParserRef.getStringArrayValue(this, "usesLibraryFiles")
 
-val Any.installLocation: Int
+val Package.installLocation: Int
     get() = PackageParserRef.getIntValue(this, "installLocation", 0)
 
-val Any.coreApp: Boolean
+val Package.coreApp: Boolean
     get() = PackageParserRef.getBooleanValue(this, "coreApp", false)
 
-val Any.cpuAbiOverride: String?
+val Package.cpuAbiOverride: String?
     get() = PackageParserRef.getStringValue(this, "cpuAbiOverride")
 
-val Any.use32bitAbi: Boolean
+val Package.use32bitAbi: Boolean
     get() = PackageParserRef.getBooleanValue(this, "use32bitAbi", false)
 
-val Any.restrictUpdateHash: ByteArray?
+val Package.restrictUpdateHash: ByteArray?
     get() = PackageParserRef.getByteArrayValue(this, "restrictUpdateHash")
 
-val Any.visibleToInstantApps: Boolean
+val Package.visibleToInstantApps: Boolean
     get() = PackageParserRef.getBooleanValue(this, "visibleToInstantApps", false)
 
-val Any.requestedPermissions: List<String>?
+val Package.requestedPermissions: List<String>?
     get() = PackageParserRef.getStringListValue(this, "requestedPermissions")
 
-val Any.protectedBroadcasts: List<String>?
+val Package.protectedBroadcasts: List<String>?
     get() = PackageParserRef.getStringListValue(this, "protectedBroadcasts")
 
-val Any.libraryNames: List<String>?
+val Package.libraryNames: List<String>?
     get() = PackageParserRef.getStringListValue(this, "libraryNames")
 
-val Any.usesLibraries: List<String>?
+val Package.usesLibraries: List<String>?
     get() = PackageParserRef.getStringListValue(this, "usesLibraries")
 
-val Any.usesStaticLibraries: List<String>?
+val Package.usesStaticLibraries: List<String>?
     get() = PackageParserRef.getStringListValue(this, "usesStaticLibraries")
 
-val Any.usesOptionalLibraries: List<String>?
+val Package.usesOptionalLibraries: List<String>?
     get() = PackageParserRef.getStringListValue(this, "usesOptionalLibraries")
 
 /**
  * @return List<Activity>
  */
-val Any.activities: List<Any>?
+val Package.activities: List<Activity>?
     get() = PackageParserRef.getObjectListValue(this, "activities")
 
 /**
  * @return List<Activity>
  */
-val Any.receivers: List<Any>?
+val Package.receivers: List<Activity>?
     get() = PackageParserRef.getObjectListValue(this, "receivers")
 
 /**
  * @return List<Service>
  */
-val Any.services: List<Any>?
+val Package.services: List<Service>?
     get() = PackageParserRef.getObjectListValue(this, "services")
 
 /**
  * @return List<Provider>
  */
-val Any.providers: List<Any>?
+val Package.providers: List<Provider>?
     get() = PackageParserRef.getObjectListValue(this, "providers")
 
 /**
  * @return List<Permission>
  */
-val Any.permissions: List<Any>?
+val Package.permissions: List<Permission>?
     get() = PackageParserRef.getObjectListValue(this, "permissions")
 
 /**
  * @return List<PermissionGroup>
  */
-val Any.permissionGroups: List<Any>?
+val Package.permissionGroups: List<PermissionGroup>?
     get() = PackageParserRef.getObjectListValue(this, "permissionGroups")
 
 /**
  * @return List<Instrumentation>
  */
-val Any.instrumentation: List<Any>?
+val Package.instrumentation: List<Instrumentation>?
     get() = PackageParserRef.getObjectListValue(this, "instrumentation")
 
 @Suppress("UNCHECKED_CAST")
-val Any.reqFeatures: List<FeatureInfo>?
+val Package.reqFeatures: List<FeatureInfo>?
     get() = PackageParserRef.getObjectListValue(this, "reqFeatures") as List<FeatureInfo>?
 
 @Suppress("UNCHECKED_CAST")
-val Any.featureGroups: List<FeatureGroupInfo>?
+val Package.featureGroups: List<FeatureGroupInfo>?
     get() = PackageParserRef.getObjectListValue(this, "featureGroups") as List<FeatureGroupInfo>?
 
 @Suppress("UNCHECKED_CAST")
-val Any.configPreferences: List<ConfigurationInfo>?
+val Package.configPreferences: List<ConfigurationInfo>?
     get() = PackageParserRef.getObjectListValue(this, "configPreferences") as List<ConfigurationInfo>?
-
-
 
 
 /**
@@ -247,26 +210,8 @@ val Any.configPreferences: List<ConfigurationInfo>?
  * ******************************************
  */
 
-val Any.isActivity: Boolean
-    get() {
-        var ret = false
-        try {
-            val cPackage = Class.forName("android.content.pm.PackageParser\$Activity")
-            val cThis = javaClass
-            ret = cPackage == cThis
-        } catch (e: Throwable) {
-
-        }
-        return ret
-    }
-
-// ==============================================================
-// All methods here must be called when "isActivity" equals true.
-// ==============================================================
-
-val Any.activityInfo: ActivityInfo?
+val Activity.activityInfo: ActivityInfo?
     get() = PackageParserRef.getObjectValue(this, "info") as ActivityInfo?
-
 
 /**
  * ******************************************
@@ -276,24 +221,7 @@ val Any.activityInfo: ActivityInfo?
  * ******************************************
  */
 
-val Any.isService: Boolean
-    get() {
-        var ret = false
-        try {
-            val cPackage = Class.forName("android.content.pm.PackageParser\$Service")
-            val cThis = javaClass
-            ret = cPackage == cThis
-        } catch (e: Throwable) {
-
-        }
-        return ret
-    }
-
-// ==============================================================
-// All methods here must be called when "isService" equals true.
-// ==============================================================
-
-val Any.serviceInfo: ServiceInfo?
+val Service.serviceInfo: ServiceInfo?
     get() = PackageParserRef.getObjectValue(this, "info") as ServiceInfo?
 
 /**
@@ -304,28 +232,11 @@ val Any.serviceInfo: ServiceInfo?
  * ******************************************
  */
 
-val Any.isProvider: Boolean
-    get() {
-        var ret = false
-        try {
-            val cPackage = Class.forName("android.content.pm.PackageParser\$Provider")
-            val cThis = javaClass
-            ret = cPackage == cThis
-        } catch (e: Throwable) {
-
-        }
-        return ret
-    }
-
-// ==============================================================
-// All methods here must be called when "isProvider" equals true.
-// ==============================================================
-
-val Any.providerInfo: ProviderInfo?
+val Provider.providerInfo: ProviderInfo?
     get() = PackageParserRef.getObjectValue(this, "info") as ProviderInfo?
 
 
-val Any.providerSyncable: Boolean
+val Provider.providerSyncable: Boolean
     get() = PackageParserRef.getBooleanValue(this, "syncable", false)
 
 
@@ -337,34 +248,17 @@ val Any.providerSyncable: Boolean
  * ******************************************
  */
 
-val Any.isPermission: Boolean
-    get() {
-        var ret = false
-        try {
-            val cPackage = Class.forName("android.content.pm.PackageParser\$Permission")
-            val cThis = javaClass
-            ret = cPackage == cThis
-        } catch (e: Throwable) {
-
-        }
-        return ret
-    }
-
-// ==============================================================
-// All methods here must be called when "isService" equals true.
-// ==============================================================
-
-val Any.permissionInfo: PermissionInfo?
+val Permission.permissionInfo: PermissionInfo?
     get() = PackageParserRef.getObjectValue(this, "info") as PermissionInfo?
 
 
-val Any.permissionTree: Boolean
+val Permission.permissionTree: Boolean
     get() = PackageParserRef.getBooleanValue(this, "tree", false)
 
 /**
  * @return PermissionGroup
  */
-val Any.permissionGroup: Any?
+val Permission.permissionGroup: PermissionGroup?
     get() = PackageParserRef.getObjectValue(this, "group")
 
 /**
@@ -375,24 +269,7 @@ val Any.permissionGroup: Any?
  * ******************************************
  */
 
-val Any.isPermissionGroup: Boolean
-    get() {
-        var ret = false
-        try {
-            val cPackage = Class.forName("android.content.pm.PackageParser\$PermissionGroup")
-            val cThis = javaClass
-            ret = cPackage == cThis
-        } catch (e: Throwable) {
-
-        }
-        return ret
-    }
-
-// ==============================================================
-// All methods here must be called when "isService" equals true.
-// ==============================================================
-
-val Any.permissionGroupInfo: PermissionGroupInfo?
+val PermissionGroup.permissionGroupInfo: PermissionGroupInfo?
     get() = PackageParserRef.getObjectValue(this, "info") as PermissionGroupInfo?
 
 /**
@@ -403,24 +280,8 @@ val Any.permissionGroupInfo: PermissionGroupInfo?
  * ******************************************
  */
 
-val Any.isInstrumentation: Boolean
-    get() {
-        var ret = false
-        try {
-            val cPackage = Class.forName("android.content.pm.PackageParser\$Instrumentation")
-            val cThis = javaClass
-            ret = cPackage == cThis
-        } catch (e: Throwable) {
 
-        }
-        return ret
-    }
-
-// ==============================================================
-// All methods here must be called when "isInstrumentation" equals true.
-// ==============================================================
-
-val Any.instrumentationInfo: InstrumentationInfo?
+val Instrumentation.instrumentationInfo: InstrumentationInfo?
     get() = PackageParserRef.getObjectValue(this, "info") as InstrumentationInfo?
 
 /**
@@ -441,23 +302,23 @@ val Any.instrumentationInfo: InstrumentationInfo?
  * @return List<IntentFilter>
  */
 @Suppress("UNCHECKED_CAST")
-val Any.intents: List<IntentFilter>?
+val Component.intents: List<IntentFilter>?
     get() = PackageParserRef.getObjectListValueSuper(this, "intents") as List<IntentFilter>?
 
-val Any.className: String?
+val Component.className: String?
     get() = PackageParserRef.getStringValueSuper(this, "className")
 
-val Any.metaData: Bundle?
+val Component.metaData: Bundle?
     get() = PackageParserRef.getObjectValueSuper(this, "metaData") as Bundle?
 
 /**
  * @return Package
  */
-val Any.owner: Any?
+val Component.owner: Package?
     get() = PackageParserRef.getObjectValueSuper(this, "owner")
 
-val Any.componentName: ComponentName?
+val Component.componentName: ComponentName?
     get() = PackageParserRef.getObjectValueSuper(this, "componentName") as ComponentName?
 
-val Any.componentShortName: String?
+val Component.componentShortName: String?
     get() = PackageParserRef.getStringValueSuper(this, "componentShortName")
