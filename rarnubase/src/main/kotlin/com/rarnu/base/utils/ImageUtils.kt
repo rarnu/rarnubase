@@ -396,16 +396,29 @@ fun imageAsync(init: ImageBitmap.() -> Unit) = thread { image(init) }
 fun image(init: ImageBitmap.() -> Unit): Bitmap? {
     val ib = ImageBitmap()
     ib.init()
-    val ret: Bitmap?
-    when (ib.type) {
-        ImageOperation.ROUNDCORNER -> ret = ImageUtils.roundedCornerBitmap(ib.bitmap, ib.radis)
-        ImageOperation.BLACKWHITE -> { ret = ImageUtils.blackWhiteBmp(ib.bitmap) }
-        ImageOperation.ROTATE -> { ret = ImageUtils.rotateBmp(ib.bitmap, ib.angle) }
-        ImageOperation.FLIP -> { ret = ImageUtils.flipBmp(ib.bitmap, ib.mode) }
-        ImageOperation.MATRIX -> { ret = ImageUtils.matrixBmp(ib.bitmap, ib.margin) }
-        ImageOperation.COLORMATRIX -> { ret = ImageUtils.colorMatrixBmp(ib.bitmap, ib.matrixSrc) }
-        ImageOperation.ZOOM -> { ret = ImageUtils.zoomImage(ib.bitmap, ib.newWidth, ib.newHeight) }
-        ImageOperation.BLUR -> { ret = ImageUtils.blurBmp(ib.bitmap, ib.blur) }
+    val ret = when (ib.type) {
+        ImageOperation.ROUNDCORNER -> ImageUtils.roundedCornerBitmap(ib.bitmap, ib.radis)
+        ImageOperation.BLACKWHITE -> {
+            ImageUtils.blackWhiteBmp(ib.bitmap)
+        }
+        ImageOperation.ROTATE -> {
+            ImageUtils.rotateBmp(ib.bitmap, ib.angle)
+        }
+        ImageOperation.FLIP -> {
+            ImageUtils.flipBmp(ib.bitmap, ib.mode)
+        }
+        ImageOperation.MATRIX -> {
+            ImageUtils.matrixBmp(ib.bitmap, ib.margin)
+        }
+        ImageOperation.COLORMATRIX -> {
+            ImageUtils.colorMatrixBmp(ib.bitmap, ib.matrixSrc)
+        }
+        ImageOperation.ZOOM -> {
+            ImageUtils.zoomImage(ib.bitmap, ib.newWidth, ib.newHeight)
+        }
+        ImageOperation.BLUR -> {
+            ImageUtils.blurBmp(ib.bitmap, ib.blur)
+        }
     }
     ib._status(ret)
     return ret

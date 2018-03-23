@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.Menu
 import com.rarnu.base.app.BaseFragment
 import com.rarnu.base.utils.*
+import kotlinx.android.synthetic.main.activity_main.view.*
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -26,8 +27,7 @@ class MainFragment : BaseFragment() {
     }
 
     override fun initLogic() {
-
-
+        /*
         thread {
             val parser = PackageParserP.newPackageParser()
             val p = parser?.parsePackage(File(activity.filesDir, "a.apk"), 0)
@@ -50,6 +50,7 @@ class MainFragment : BaseFragment() {
                 p.permissions?.forEach { Log.e(tag, "p.permission => ${it.permissionInfo}") }
             }
         }
+        */
 
 
         /*
@@ -96,22 +97,24 @@ class MainFragment : BaseFragment() {
             }
         }
 
+        */
+
         downloadAsync(activity) {
-            url = "http://rarnu.xyz/yugioh/image/p1.png"
+            url = "https://res.hjfile.cn/pt/hj/images/logo.png"
             localDir = "/sdcard/"
             localFile = "p1.png"
             imageView = innerView.imgPic
+            progress { status, position, fileSize, errMsg ->
+                Log.e("DOWNLOAD", "status:$status, position:$position, fileSize:$fileSize, errMsg:$errMsg")
+            }
         }
-        */
     }
 
     override fun getFragmentLayoutResId(): Int = R.layout.activity_main
 
     override fun getMainActivityName(): String? = null
 
-    override fun initMenu(menu: Menu) {
-
-    }
+    override fun initMenu(menu: Menu) { }
 
     override fun onGetNewArguments(bn: Bundle?) {
 

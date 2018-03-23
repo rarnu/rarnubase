@@ -1,9 +1,8 @@
 package com.rarnu.base.utils
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.os.Handler
-import android.os.Message
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -31,7 +30,16 @@ object DownloadUtils {
         }
     }
 
-    fun downloadFileT(@Suppress("UNUSED_PARAMETER") context: Context, iv: ImageView?, url: String, localDir: String, localFile: String, hProgress: Handler?, bop: BitmapFactory.Options?, isRound: Boolean, radis: Int) {
+    fun downloadFileT(
+            activity: Activity,
+            url: String,
+            localDir: String,
+            localFile: String,
+            iv: ImageView? = null,
+            bop: BitmapFactory.Options? = null,
+            isRound: Boolean = false,
+            radis: Int = 0,
+            handle: ((Int, Int, Int, String?) -> Unit)?) {
         var nlocalDir = localDir
         if (!nlocalDir.endsWith("/")) {
             nlocalDir += "/"
@@ -45,105 +53,93 @@ object DownloadUtils {
         val fImg = File(filePath)
         if (fImg.exists()) {
             if (iv != null) {
-                var bmp = if (bop != null) { BitmapFactory.decodeFile(filePath, bop) } else { BitmapFactory.decodeFile(filePath) }
+                var bmp = if (bop != null) {
+                    BitmapFactory.decodeFile(filePath, bop)
+                } else {
+                    BitmapFactory.decodeFile(filePath)
+                }
                 if (isRound) {
                     bmp = ImageUtils.roundedCornerBitmap(bmp, radis.toFloat())
                 }
                 iv.setImageBitmap(bmp)
-            } else if (hProgress != null) {
-                MessageUtils.sendMessage(hProgress, Actions.WHAT_DOWNLOAD_FINISH)
+            } else if (handle != null) {
+                handle(Actions.WHAT_DOWNLOAD_FINISH, 0, 0, null)
             }
             return
         }
 
-        val hImage = object : Handler() {
-            override fun handleMessage(msg: Message?) {
-                if (msg!!.what == 1) {
-                    val file = File(filePath)
-                    if (file.exists()) {
-                        if (iv != null) {
-                            var bmp = if (bop != null) { BitmapFactory.decodeFile(filePath, bop) } else { BitmapFactory.decodeFile(filePath) }
-                            if (isRound) {
-                                bmp = ImageUtils.roundedCornerBitmap(bmp, radis.toFloat())
-                            }
-                            iv.setImageBitmap(bmp)
+        val tDownload = Thread {
+            downloadFile(url, filePath, handle, null)
+            activity.runOnUiThread {
+                val file = File(filePath)
+                if (file.exists()) {
+                    if (iv != null) {
+                        var bmp = if (bop != null) {
+                            BitmapFactory.decodeFile(filePath, bop)
+                        } else {
+                            BitmapFactory.decodeFile(filePath)
                         }
-                    }
-                    for (di in listDownloading) {
-                        if (di.fileName == filePath) {
-                            listDownloading.remove(di)
-                            break
+                        if (isRound) {
+                            bmp = ImageUtils.roundedCornerBitmap(bmp, radis.toFloat())
                         }
+                        iv.setImageBitmap(bmp)
                     }
                 }
-                super.handleMessage(msg)
+                for (di in listDownloading) {
+                    if (di.fileName == filePath) {
+                        listDownloading.remove(di)
+                        break
+                    }
+                }
             }
-        }
-
-        val tDownload = Thread {
-            downloadFile(url, filePath, hProgress, null)
-            hImage.sendEmptyMessage(1)
         }
 
         val info = DownloadInfo()
         info.fileName = filePath
         info.thread = tDownload
-
-        var hasTask = false
-        for (di in listDownloading) {
-            if (di.fileName == info.fileName) {
-                hasTask = true
-                break
-            }
-        }
+        val hasTask = listDownloading.any { it.fileName == info.fileName }
         if (!hasTask) {
             listDownloading.add(info)
             tDownload.start()
         }
     }
 
-    fun downloadFileT(context: Context, iv: ImageView?, tv: TextView?, url: String, localDir: String, localFile: String) {
-        val hDownload = object : Handler() {
-            override fun handleMessage(msg: Message?) {
-                when (msg!!.what) {
-                    Actions.WHAT_DOWNLOAD_START -> {
-                        tv?.visibility = View.VISIBLE
-                        tv?.text = "${msg.arg1} / ${msg.arg2}"
-                    }
-                    Actions.WHAT_DOWNLOAD_PROGRESS -> {
-                        tv?.text = "${msg.arg1} / ${msg.arg2}"
-                    }
-                    Actions.WHAT_DOWNLOAD_FINISH -> {
-                        tv?.visibility = View.GONE
+    fun downloadFileT(activity: Activity, url: String, localDir: String, localFile: String, iv: ImageView?, tv: TextView?) =
+            downloadFileT(activity, url, localDir, localFile, iv = iv) { status, position, fileSize, _ ->
+                activity.runOnUiThread {
+                    when (status) {
+                        Actions.WHAT_DOWNLOAD_START -> {
+                            tv?.visibility = View.VISIBLE
+                            tv?.text = "$position / $fileSize"
+                        }
+                        Actions.WHAT_DOWNLOAD_PROGRESS -> {
+                            tv?.text = "$position / $fileSize"
+                        }
+                        Actions.WHAT_DOWNLOAD_FINISH -> {
+                            tv?.visibility = View.GONE
+                        }
                     }
                 }
-                super.handleMessage(msg)
             }
-        }
-        downloadFileT(context, iv, url, localDir, localFile, hDownload)
-    }
 
-    fun downloadFileT(context: Context, iv: ImageView?, url: String, localDir: String, localFile: String, hProgress: Handler?) =
-            downloadFileT(context, iv, url, localDir, localFile, hProgress, null, false, 0)
 
-    fun downloadFileT(context: Context, iv: ImageView?, url: String, localDir: String, localFile: String, hProgress: Handler?, isRound: Boolean, radis: Int) =
-            downloadFileT(context, iv, url, localDir, localFile, hProgress, null, isRound, radis)
-
-    fun downloadFile(address: String, localFile: String, h: Handler?, callback: BreakableThread.RunningCallback?) {
+    fun downloadFile(address: String, localFile: String, handle: ((Int, Int, Int, String?) -> Unit)?, callback: BreakableThread.RunningCallback?) {
         val fTmp = File(localFile)
         if (fTmp.exists()) {
             fTmp.delete()
         }
         var isDownloadNormal = true
-        var url: URL?
+        val url: URL?
         var filesize = 0
         var position = 0
         try {
             url = URL(address)
             val con = url.openConnection() as HttpURLConnection
-            var ins = con.inputStream
+            con.connectTimeout = 5000
+            con.readTimeout = 5000
+            val ins = con.inputStream
             filesize = con.contentLength
-            MessageUtils.sendMessage(h, Actions.WHAT_DOWNLOAD_START, position, filesize)
+            handle?.invoke(Actions.WHAT_DOWNLOAD_START, position, filesize, null)
             val fileOut = File(localFile + ".tmp")
             val out = FileOutputStream(fileOut)
             val buffer = ByteArray(1024)
@@ -153,7 +149,7 @@ object DownloadUtils {
                 if (count != -1) {
                     out.write(buffer, 0, count)
                     position += count
-                    MessageUtils.sendMessage(h, Actions.WHAT_DOWNLOAD_PROGRESS, position, filesize)
+                    handle?.invoke(Actions.WHAT_DOWNLOAD_PROGRESS, position, filesize, null)
                     if (callback != null) {
                         if (!callback.getRunningState()) {
                             isDownloadNormal = false
@@ -171,9 +167,9 @@ object DownloadUtils {
                 fileOut.delete()
                 fTmp.delete()
             }
-            MessageUtils.sendMessage(h, Actions.WHAT_DOWNLOAD_FINISH, 0, filesize)
+            handle?.invoke(Actions.WHAT_DOWNLOAD_FINISH, 0, filesize, null)
         } catch (e: Exception) {
-            MessageUtils.sendMessage(h, Actions.WHAT_DOWNLOAD_FINISH, 0, filesize, e.message)
+            handle?.invoke(Actions.WHAT_DOWNLOAD_FINISH, 0, filesize, e.message)
         }
 
     }
@@ -183,43 +179,57 @@ object DownloadUtils {
         var thread: Thread? = null
     }
 
-    class BreakableThread : Thread {
+    class BreakableThread(callback: RunningCallback?) : Thread() {
 
         interface RunningCallback {
             fun getRunningState(): Boolean
         }
 
-        private var _runningCallback: RunningCallback? = null
+        private var _runningCallback: RunningCallback? = callback
         var runningCallback: RunningCallback?
             get() = _runningCallback
             set(value) {
                 _runningCallback = value
             }
-
-        constructor(callback: RunningCallback?) : super() {
-            _runningCallback = callback
-        }
     }
 }
 
-class Download() {
+class Download {
     var imageView: ImageView? = null
     var textView: TextView? = null
     var url = ""
     var localDir = ""
     var localFile = ""
-    var handler: Handler? = null
     var bitmapOption: BitmapFactory.Options? = null
     var isRoundCorner = false
     var radis = 0
+    internal var _progress: ((Int, Int, Int, String?) -> Unit) = { _,_,_,_ -> }
+    fun progress(p:(Int, Int, Int, String?) -> Unit) {
+        _progress = p
+    }
 }
 
-fun downloadAsync(context: Context, init: Download.() -> Unit) {
+class DownloadLite {
+    var url = ""
+    var localFile = ""
+    internal var _progress: ((Int, Int, Int, String?) -> Unit)? = null
+    fun progress(p: (Int, Int, Int, String?) -> Unit) {
+        _progress = p
+    }
+}
+
+fun download(init: DownloadLite.() -> Unit) {
+    val d = DownloadLite()
+    d.init()
+    DownloadUtils.downloadFile(d.url, d.localFile, d._progress, null)
+}
+
+fun downloadAsync(activity: Activity, init: Download.() -> Unit) {
     val d = Download()
     d.init()
     if (d.textView != null) {
-        DownloadUtils.downloadFileT(context, d.imageView, d.textView, d.url, d.localDir, d.localFile)
+        DownloadUtils.downloadFileT(activity, d.url, d.localDir, d.localFile, d.imageView, d.textView)
     } else {
-        DownloadUtils.downloadFileT(context, d.imageView, d.url, d.localDir, d.localFile, d.handler, d.bitmapOption, d.isRoundCorner, d.radis)
+        DownloadUtils.downloadFileT(activity, d.url, d.localDir, d.localFile, d.imageView, d.bitmapOption, d.isRoundCorner, d.radis, d._progress)
     }
 }

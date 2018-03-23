@@ -3,7 +3,6 @@ package com.rarnu.base.utils
 import android.content.Context
 import android.os.Build
 import android.os.Environment
-import android.os.Handler
 import android.os.StatFs
 import android.util.Log
 import com.rarnu.base.app.common.Actions
@@ -107,13 +106,13 @@ object FileUtils {
         }
     }
 
-    fun copyFile(source: String, dest: String, hProgress: Handler?) {
+    fun copyFile(source: String, dest: String, handle:((Int, Int, Int) -> Unit)?) {
         val oldFile = File(source)
         if (oldFile.exists()) {
             val ins = FileInputStream(source)
             val fos = FileOutputStream(dest)
             val size = ins.available()
-            MessageUtils.sendMessage(hProgress, Actions.WHAT_COPY_START, 0, size)
+            handle?.invoke(Actions.WHAT_COPY_START, 0, size)
             var count = 0
             var n: Int
             val buffer = ByteArray(1024)
@@ -122,14 +121,14 @@ object FileUtils {
                 if (n != -1) {
                     fos.write(buffer, 0, n)
                     count += n
-                    MessageUtils.sendMessage(hProgress, Actions.WHAT_COPY_PROGRESS, count, size)
+                    handle?.invoke(Actions.WHAT_COPY_PROGRESS, count, size)
                 } else {
                     break
                 }
             }
             ins.close()
             fos.close()
-            MessageUtils.sendMessage(hProgress, Actions.WHAT_COPY_FINISH)
+            handle?.invoke(Actions.WHAT_COPY_FINISH, 0, 0)
         }
     }
 
@@ -164,8 +163,8 @@ object FileUtils {
 
     }
 
-    fun moveFile(source: String, dest: String, hProgress: Handler?) {
-        copyFile(source, dest, hProgress)
+    fun moveFile(source: String, dest: String, handle:((Int, Int, Int) -> Unit)?) {
+        copyFile(source, dest, handle)
         deleteFile(source)
     }
 
@@ -247,7 +246,7 @@ object FileUtils {
         return fileText
     }
 
-    fun copyAssetFile(context: Context, fileName: String, saveDir: String, hProgress: Handler?): Boolean {
+    fun copyAssetFile(context: Context, fileName: String, saveDir: String, handle:((Int, Int, Int) -> Unit)?): Boolean {
         val fAsset = File(saveDir)
         if (!fAsset.exists()) {
             fAsset.mkdirs()
@@ -262,21 +261,21 @@ object FileUtils {
             val fos = BufferedOutputStream(FileOutputStream(dest))
             var count = 0
             val size = ins.available()
-            MessageUtils.sendMessage(hProgress, Actions.WHAT_COPY_START, 0, size)
+            handle?.invoke(Actions.WHAT_COPY_START, 0, size)
             var n: Int
             while (true) {
                 n = ins.read(buffer, 0, buffer.size)
                 if (n != -1) {
                     fos.write(buffer, 0, n)
                     count += n
-                    MessageUtils.sendMessage(hProgress, Actions.WHAT_COPY_PROGRESS, count, size)
+                    handle?.invoke(Actions.WHAT_COPY_PROGRESS, count, size)
                 } else {
                     break
                 }
             }
             ins.close()
             fos.close()
-            MessageUtils.sendMessage(hProgress, Actions.WHAT_COPY_FINISH)
+            handle?.invoke(Actions.WHAT_COPY_FINISH, 0, 0)
             return true
         } catch (e: Exception) {
             return false

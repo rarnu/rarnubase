@@ -33,7 +33,7 @@ project.gradle.startParameter.excludedTaskNames.add('prepareDebugUnitTestDepende
 project.gradle.startParameter.excludedTaskNames.add('generateDebugAndroidTestSources')
 
 group = 'com.github.rarnu'
-version = '1.2.0'
+version = '1.2.1'
 
 signing {
     sign configurations.archives

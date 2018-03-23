@@ -50,20 +50,7 @@ abstract class BaseService: Service() {
         if (showNotification()) {
             startForeground(procId, n)
         }
-        val h = object : Handler() {
-            override fun handleMessage(msg: Message?) {
-                if (msg!!.what == 1) {
-                    operating = false
-                    fiIntent()
-                    sendBroadcast(getSendIntent())
-                    if (showNotification()) {
-                        stopForeground(true)
-                        doNotification(id, title, desc, true, Actions.ACTION_NOTIFY)
-                    }
-                }
-                super.handleMessage(msg)
-            }
-        }
+        val h = OperationHandler(id, title, desc)
         thread {
             doOperation(command, n)
             h.sendEmptyMessage(1)
@@ -110,5 +97,20 @@ abstract class BaseService: Service() {
             }
         }
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    inner class OperationHandler(var id: Int, var title: Int, var desc: Int): Handler() {
+
+        override fun handleMessage(msg: Message?) {
+            operating = false
+            fiIntent()
+            sendBroadcast(getSendIntent())
+            if (showNotification()) {
+                stopForeground(true)
+                doNotification(id, title, desc, true, Actions.ACTION_NOTIFY)
+            }
+            super.handleMessage(msg)
+        }
+
     }
 }

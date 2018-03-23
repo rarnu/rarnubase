@@ -96,6 +96,9 @@ class GifView : ImageView, GifAction {
     }
 
     private fun reDraw() {
+
+
+
         val msg = _redrawHandler.obtainMessage()
         _redrawHandler.sendMessage(msg)
     }
@@ -105,14 +108,9 @@ class GifView : ImageView, GifAction {
         invalidate()
     }
 
-    enum class GifImageType {
+    enum class GifImageType(i: Int) {
         WAIT_FINISH(0), SYNC_DECODER(1), COVER(2);
-
-        var nativeInt: Int
-
-        constructor(i: Int) {
-            nativeInt = i
-        }
+        var nativeInt: Int = i
     }
 
     inner class DrawThread : Thread() {
